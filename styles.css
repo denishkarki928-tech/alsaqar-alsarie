@@ -711,6 +711,7 @@ html.dark .testi-quote{ color: var(--primary); }
 .field input:focus,.field textarea:focus{ outline: none; border-color: var(--accent); }
 .cta-form .btn-primary{ background: var(--accent); color: var(--cream-band); align-self: flex-start; }
 .cta-form .btn-primary:hover{ background: #fff; color: var(--cream-band); }
+.cta-form-note{ font-size: 12.5px; color: rgba(244,233,219,.5); margin-top: -6px; }
 
 /* ---------- footer ---------- */
 .footer{ padding: 56px 0 40px; }

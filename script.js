@@ -67,6 +67,25 @@
     revealEls.forEach(function(el){ io.observe(el); });
   }
 
+  // ---- enquiry form -> WhatsApp ----
+  var enquiryForm = document.getElementById('enquiryForm');
+  if (enquiryForm) {
+    enquiryForm.addEventListener('submit', function(e){
+      e.preventDefault();
+      var name = enquiryForm.name.value.trim();
+      var phone = enquiryForm.phone.value.trim();
+      var message = enquiryForm.message.value.trim();
+
+      var text = 'Hi AlSaqar AlSarie, I\'d like to enquire about cleaning services.\n\n'
+        + 'Name: ' + name + '\n'
+        + 'Phone: ' + phone
+        + (message ? '\nDetails: ' + message : '');
+
+      window.open('https://wa.me/971504198901?text=' + encodeURIComponent(text), '_blank', 'noopener');
+      enquiryForm.reset();
+    });
+  }
+
   // ---- footer year ----
   var yearEl = document.getElementById('year');
   if (yearEl) yearEl.textContent = new Date().getFullYear();

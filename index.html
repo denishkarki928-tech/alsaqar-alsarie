@@ -375,11 +375,12 @@
             </a>
           </div>
         </div>
-        <form class="cta-form reveal reveal-delay-1" onsubmit="event.preventDefault(); this.reset(); alert('Thanks — we\'ll be in touch within a few hours.');">
-          <div class="field"><input type="text" placeholder="Your name" required></div>
-          <div class="field"><input type="tel" placeholder="Phone number" required></div>
-          <div class="field"><textarea rows="3" placeholder="Tell us about your household..."></textarea></div>
-          <button type="submit" class="btn btn-primary">Send enquiry <span class="arrow">→</span></button>
+        <form class="cta-form reveal reveal-delay-1" id="enquiryForm">
+          <div class="field"><input type="text" name="name" placeholder="Your name" required></div>
+          <div class="field"><input type="tel" name="phone" placeholder="Phone number" required></div>
+          <div class="field"><textarea name="message" rows="3" placeholder="Tell us about your household..."></textarea></div>
+          <button type="submit" class="btn btn-primary">Send enquiry on WhatsApp <span class="arrow">→</span></button>
+          <p class="cta-form-note">We'll open WhatsApp with your details filled in — just hit send.</p>
         </form>
       </div>
     </div>
