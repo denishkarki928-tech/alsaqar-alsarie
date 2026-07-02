@@ -112,6 +112,89 @@ import * as THREE from 'https://unpkg.com/three@0.160.1/build/three.module.js';
     meshes.push(mesh);
   }
 
+  // --- Harmonic nebula particle swarm ---------------------------------------
+  // A breathing spherical-harmonic membrane of thousands of warm motes, with
+  // "galactic" differential rotation (outer shells lag inner ones). Adapted
+  // from the swarm sketch to fit this hero: tuned to the camera's world scale,
+  // painted from the brand palette, and using normal blending so it reads on
+  // the cream background as well as in dark mode. Shares this scene + renderer.
+  var PARTICLE_COUNT = isSmallScreen ? 2600 : 8000;
+  var NEB_SCALE  = 6.6;   // core radius, sized to fill the hero at z~0
+  var NEB_MORPH  = 1.5;   // harmonic displacement depth
+  var NEB_CHAOS  = 0.55;  // fine turbulence
+  var NEB_SWIRL  = 1.35;  // differential rotation strength
+  var NEB_SPEED  = 0.32;  // flow speed
+  var NEB_Z      = -3;    // pushed slightly back so glass shapes float ahead
+
+  // Soft round glow sprite so particles read as light, not squares.
+  function makeSpriteTexture(){
+    var size = 64;
+    var c = document.createElement('canvas');
+    c.width = c.height = size;
+    var ctx = c.getContext('2d');
+    var g = ctx.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
+    g.addColorStop(0, 'rgba(255,255,255,1)');
+    g.addColorStop(0.35, 'rgba(255,255,255,0.8)');
+    g.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, size, size);
+    var tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    return tex;
+  }
+
+  var partGeo = new THREE.BufferGeometry();
+  var partPos = new Float32Array(PARTICLE_COUNT * 3);
+  var partColor = new Float32Array(PARTICLE_COUNT * 3);
+  // Per-particle constants (a Fibonacci-sphere direction) precomputed once so
+  // the per-frame loop is pure math with zero allocation.
+  var nebPhi = new Float32Array(PARTICLE_COUNT);
+  var nebLon0 = new Float32Array(PARTICLE_COUNT);
+  var nebRing = new Float32Array(PARTICLE_COUNT);
+  var nebBright = new Float32Array(PARTICLE_COUNT);
+  var GOLDEN = 2.399963229728653; // pi * (3 - sqrt(5))
+
+  function paintParticleColors(){
+    var pal = readPalette();
+    var tmp = new THREE.Color();
+    for (var i = 0; i < PARTICLE_COUNT; i++){
+      tmp.set(pal[i % pal.length]);
+      var b = nebBright[i];
+      partColor[i*3]   = tmp.r * b;
+      partColor[i*3+1] = tmp.g * b;
+      partColor[i*3+2] = tmp.b * b;
+    }
+    if (partGeo.attributes.color) partGeo.attributes.color.needsUpdate = true;
+  }
+
+  var n = PARTICLE_COUNT > 1 ? PARTICLE_COUNT - 1 : 1;
+  for (var p = 0; p < PARTICLE_COUNT; p++){
+    var fy = 1 - (p / n) * 2;            // even latitudes across the sphere
+    if (fy < -1) fy = -1; else if (fy > 1) fy = 1;
+    nebPhi[p] = Math.acos(fy);
+    nebRing[p] = Math.sqrt(Math.max(0, 1 - fy * fy));
+    nebLon0[p] = GOLDEN * p;
+    nebBright[p] = rand(0.65, 1.0);      // depth variation in tone
+  }
+  partGeo.setAttribute('position', new THREE.BufferAttribute(partPos, 3));
+  partGeo.setAttribute('color', new THREE.BufferAttribute(partColor, 3));
+  paintParticleColors();
+
+  var partMat = new THREE.PointsMaterial({
+    size: isSmallScreen ? 0.11 : 0.09,
+    map: makeSpriteTexture(),
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.9,
+    depthWrite: false,
+    blending: THREE.NormalBlending,
+    sizeAttenuation: true
+  });
+  var particles = new THREE.Points(partGeo, partMat);
+  particles.position.z = NEB_Z;
+  group.add(particles); // inherits the same cursor parallax as the shapes
+  // --------------------------------------------------------------------------
+
   var pointer = { x: 0, y: 0 };
   var targetRotX = 0, targetRotY = 0;
   var targetPanX = 0, targetPanY = 0;
@@ -156,6 +239,24 @@ import * as THREE from 'https://unpkg.com/three@0.160.1/build/three.module.js';
       mesh.position.y = d.baseY + Math.sin(t * d.driftSpeed * 3 + d.floatOffset) * d.floatAmp;
       mesh.position.x = d.baseX + Math.cos(t * d.driftSpeed * 2 + d.floatOffset) * d.floatAmp * 0.6;
     });
+    // Breathing spherical-harmonic membrane: recompute each mote's radius from
+    // its fixed sphere direction, add differential rotation + turbulence.
+    var pa = partGeo.attributes.position.array;
+    var nt = t * NEB_SPEED;
+    for (var k = 0; k < PARTICLE_COUNT; k++){
+      var phi = nebPhi[k];
+      var lon = nebLon0[k] + NEB_SWIRL * (0.6 + 0.4 * nebRing[k]) * nt;
+      var h = Math.sin(4 * phi + nt) * Math.cos(3 * lon - nt)
+            + 0.5 * Math.sin(7 * phi - nt * 1.3);
+      var turb = NEB_CHAOS * Math.sin(lon * 5 + nt * 2) * Math.sin(phi * 6 - nt);
+      var r = NEB_SCALE + NEB_MORPH * h + turb;
+      var sp = Math.sin(phi);
+      pa[k*3]   = r * sp * Math.cos(lon);
+      pa[k*3+1] = r * Math.cos(phi);
+      pa[k*3+2] = r * sp * Math.sin(lon);
+    }
+    partGeo.attributes.position.needsUpdate = true;
+
     group.rotation.y += (targetRotY - group.rotation.y) * 0.04;
     group.rotation.x += (targetRotX - group.rotation.x) * 0.04;
     group.position.x += (targetPanX - group.position.x) * 0.03;
@@ -208,6 +309,7 @@ import * as THREE from 'https://unpkg.com/three@0.160.1/build/three.module.js';
       mesh.material.emissive.set(c);
     });
     scene.fog.color.set(cssVar('--bg', '#FBF2E4'));
+    paintParticleColors();
     if (reduceMotion) renderFrame();
   });
   themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
