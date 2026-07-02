@@ -204,7 +204,7 @@ import * as THREE from 'https://unpkg.com/three@0.160.1/build/three.module.js';
   // bare on the lower sections. This second field is a wide, gently drifting
   // warm haze added straight to the scene (NOT the rotating group), so it
   // always fills the frame — guaranteeing particles across the whole page.
-  var DUST_COUNT = isSmallScreen ? 2400 : 6500;
+  var DUST_COUNT = isSmallScreen ? 1500 : 4000;
   var DUST_X = 22, DUST_Y = 16;          // wide enough to cover the viewport
   var DUST_Z_NEAR = -4, DUST_Z_FAR = -13;
   var dustGeo = new THREE.BufferGeometry();
@@ -261,7 +261,7 @@ import * as THREE from 'https://unpkg.com/three@0.160.1/build/three.module.js';
     map: makeSpriteTexture(),
     vertexColors: true,
     transparent: true,
-    opacity: 0.85,
+    opacity: 0.55,
     depthWrite: false,
     blending: THREE.NormalBlending,
     sizeAttenuation: true,
