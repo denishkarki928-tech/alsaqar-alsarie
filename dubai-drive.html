@@ -22,7 +22,7 @@
   .timer { font-size: 40px; font-weight: 800; line-height: 1; letter-spacing: -0.5px; }
   .timer.warn { color: #ff6a4d; }
   .timer small { font-size: 15px; font-weight: 600; opacity: 0.6; margin-left: 4px; }
-  .cps { margin-top: 6px; font-size: 15px; opacity: 0.75; letter-spacing: 0.5px; }
+  .cps { margin-top: 6px; font-size: 15px; opacity: 0.78; letter-spacing: 0.3px; }
   .cps b { color: #ffd28a; }
 
   #minimap {
@@ -31,6 +31,13 @@
     background: rgba(10,8,16,0.55); backdrop-filter: blur(4px);
     box-shadow: 0 8px 30px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12);
   }
+  #dnToggle {
+    position: fixed; right: 20px; top: 200px; z-index: 6;
+    width: 44px; height: 44px; border-radius: 12px; font-size: 20px; cursor: pointer;
+    background: rgba(10,8,16,0.5); color: #fff; border: 1px solid rgba(255,255,255,0.18);
+    backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center;
+  }
+  #dnToggle:hover { background: rgba(255,157,77,0.4); }
 
   .hint {
     position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
@@ -40,7 +47,6 @@
   }
   .hint kbd { display: inline-block; padding: 2px 8px; margin: 0 1px; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px; font-size: 12px; }
 
-  /* Mobile touch controls */
   #touch { position: fixed; inset: 0; z-index: 6; pointer-events: none; display: none; }
   #touch .pad { position: absolute; bottom: 28px; }
   #touch .left { left: 24px; }
@@ -55,7 +61,6 @@
   #touch .steer { display: flex; gap: 14px; }
   .tbtn.small { width: 64px; height: 64px; font-size: 15px; }
   @media (hover: none) and (pointer: coarse) { #touch.enabled { display: block; } }
-  body.forceTouch #touch.enabled { display: block; }
 
   .overlay {
     position: fixed; inset: 0; display: flex; flex-direction: column;
@@ -71,7 +76,7 @@
     margin-bottom: 4px;
   }
   .overlay .sub { font-size: 15px; letter-spacing: 4px; text-transform: uppercase; opacity: 0.5; margin-bottom: 22px; }
-  .overlay p { font-size: 16px; opacity: 0.78; max-width: 460px; line-height: 1.55; margin-bottom: 26px; }
+  .overlay p { font-size: 16px; opacity: 0.78; max-width: 470px; line-height: 1.55; margin-bottom: 26px; }
   .overlay .big { font-size: 22px; margin-bottom: 8px; }
   .overlay .big b { color: #ffd28a; }
   .btn {
@@ -99,13 +104,15 @@
 
   <div class="stats" id="stats" style="display:none">
     <div class="timer" id="timer">45.0<small>s</small></div>
-    <div class="cps">Checkpoints <b id="cpCount">0</b></div>
+    <div class="cps">Lap <b id="lapNum">1</b> · CP <b id="cpNum">0/7</b> · <span id="lapTime">0:00.0</span></div>
+    <div class="cps">Best lap <b id="bestLap">—</b></div>
   </div>
 
   <canvas id="minimap" width="170" height="170" style="display:none"></canvas>
+  <button id="dnToggle" title="Toggle day / night">☀</button>
 
   <div class="hint" id="hint" style="display:none">
-    <kbd>W</kbd> go · <kbd>S</kbd> brake · <kbd>A</kbd>/<kbd>D</kbd> steer · <kbd>Space</kbd> handbrake · hit the glowing gates
+    <kbd>W</kbd> go · <kbd>S</kbd> brake · <kbd>A</kbd>/<kbd>D</kbd> steer · <kbd>Space</kbd> drift · <kbd>N</kbd> day/night · follow the gates
   </div>
 
   <div id="touch">
@@ -121,16 +128,16 @@
 
   <div class="overlay" id="startScreen">
     <h1>Dubai Drive</h1>
-    <div class="sub">Time Attack · City Cruise</div>
-    <p>Race the golden-hour skyline. Blast through the glowing gates to bank more time, dodge the traffic, and see how many checkpoints you can hit before the clock runs out.</p>
+    <div class="sub">Lap Circuit · Day &amp; Night</div>
+    <p>Chase the glowing gates around the circuit, lap after lap, past the Burj. Bank time at every gate, throw it sideways into the corners for drift marks, and chase your best lap. Tap ☀ or press N to flip to night.</p>
     <button class="btn" id="startBtn">Start Driving</button>
-    <div class="keys"><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> / arrows · <kbd>Space</kbd> handbrake · touch controls on mobile</div>
+    <div class="keys"><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> / arrows · <kbd>Space</kbd> drift · <kbd>N</kbd> night · touch on mobile</div>
   </div>
 
   <div class="overlay hidden" id="endScreen">
     <h1>Time's Up</h1>
-    <div class="big">Checkpoints: <b id="finalCps">0</b></div>
-    <p id="bestLine">Best: 0</p>
+    <div class="big">Laps: <b id="finalLaps">0</b> · Gates: <b id="finalCps">0</b></div>
+    <p id="bestLine">Best lap: —</p>
     <button class="btn" id="againBtn">Drive Again</button>
   </div>
 
@@ -138,6 +145,7 @@
 <script>
 (function () {
   const THREE = window.THREE;
+  const L = (a, b, t) => a + (b - a) * t;
 
   const canvas = document.getElementById('game');
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
@@ -152,7 +160,10 @@
   const camera = new THREE.PerspectiveCamera(65, 1, 0.1, 2000);
 
   // ---------- Lighting ----------
-  scene.add(new THREE.HemisphereLight(0xffe0b0, 0x8a6a4a, 0.9));
+  const hemi = new THREE.HemisphereLight(0xffe0b0, 0x8a6a4a, 0.9);
+  scene.add(hemi);
+  const amb = new THREE.AmbientLight(0x3a4a7a, 0);
+  scene.add(amb);
   const sun = new THREE.DirectionalLight(0xffd9a0, 2.2);
   sun.position.set(-160, 180, 120);
   sun.castShadow = true;
@@ -171,6 +182,11 @@
     fragmentShader: 'varying vec3 vP; uniform vec3 top; uniform vec3 mid; uniform vec3 bot; void main(){ float h = normalize(vP).y; vec3 c = h>0.15 ? mix(mid, top, smoothstep(0.15,0.7,h)) : mix(bot, mid, smoothstep(-0.1,0.15,h)); gl_FragColor = vec4(c,1.0);}'
   });
   scene.add(new THREE.Mesh(new THREE.SphereGeometry(1000, 32, 16), skyMat));
+
+  // Day / night palettes
+  const dayTop = new THREE.Color(0x2a5b9e), dayMid = new THREE.Color(0xf2b87a), dayBot = new THREE.Color(0xffdca8), dayBg = new THREE.Color(0xf2b87a);
+  const nTop = new THREE.Color(0x070b1e), nMid = new THREE.Color(0x172246), nBot = new THREE.Color(0x3a2f4e), nBg = new THREE.Color(0x0b1026);
+  const daySun = new THREE.Color(0xffd9a0), nSun = new THREE.Color(0x8fa0d0);
 
   // ---------- Ground & roads ----------
   const CITY = 620, BLOCK = 90, ROAD_W = 26;
@@ -201,6 +217,7 @@
   // ---------- Buildings ----------
   const glassColors = [0x8fb8d8, 0xb8d0e0, 0x7fa8c8, 0xd8c0a0, 0xa0c0d0, 0xc8b090, 0x90a8c0];
   const buildingColliders = [];
+  const cityMats = []; // { mat, day, night } emissiveIntensity targets
   const halfLot = (BLOCK - ROAD_W) / 2 - 4;
 
   function addBuilding(cx, cz) {
@@ -208,7 +225,8 @@
     const d = 14 + Math.random() * (halfLot * 1.4);
     const h = 24 + Math.pow(Math.random(), 2) * 190;
     const col = glassColors[(Math.random() * glassColors.length) | 0];
-    const mat = new THREE.MeshStandardMaterial({ color: col, roughness: 0.25, metalness: 0.55, emissive: new THREE.Color(col).multiplyScalar(0.12) });
+    const mat = new THREE.MeshStandardMaterial({ color: col, roughness: 0.25, metalness: 0.55, emissive: new THREE.Color(col), emissiveIntensity: 0.1 });
+    cityMats.push({ mat, day: 0.1, night: 0.85 });
     const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
     b.position.set(cx, h / 2, cz); b.castShadow = true; b.receiveShadow = true; scene.add(b);
     if (h > 120 && Math.random() < 0.5) {
@@ -217,18 +235,40 @@
     }
     buildingColliders.push({ x: cx, z: cz, hx: w / 2 + 1.5, hz: d / 2 + 1.5 });
   }
-  function addLandmark(cx, cz) {
-    const mat = new THREE.MeshStandardMaterial({ color: 0xdfe8f0, roughness: 0.15, metalness: 0.7, emissive: 0x334455, emissiveIntensity: 0.2 });
-    let y = 0; const segs = 9;
-    for (let i = 0; i < segs; i++) {
-      const s = 44 * (1 - i / segs) + 6, segH = 46 - i * 2.5;
-      const box = new THREE.Mesh(new THREE.BoxGeometry(s, segH, s), mat);
-      box.position.set(cx, y + segH / 2, cz); box.rotation.y = i * 0.12; box.castShadow = true; box.receiveShadow = true; scene.add(box); y += segH;
+
+  // Burj Khalifa — tri-lobed spiralling supertall with a needle spire
+  function addBurj(cx, cz) {
+    const mat = new THREE.MeshStandardMaterial({ color: 0xd7e2ee, roughness: 0.12, metalness: 0.75, emissive: new THREE.Color(0x9fc0e8), emissiveIntensity: 0.14 });
+    cityMats.push({ mat, day: 0.14, night: 0.7 });
+    const group = new THREE.Group();
+    const tiers = 26, tierH = 15, baseR = 32;
+    let y = 0;
+    for (let i = 0; i < tiers; i++) {
+      const f = i / tiers;
+      const r = baseR * Math.pow(1 - f, 0.85) + 2.5;
+      const rot = f * Math.PI * 1.35;                // gentle spiral
+      // central core
+      const core = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.42, r * 0.42, tierH + 0.4, 6), mat);
+      core.position.set(cx, y + tierH / 2, cz); core.rotation.y = rot; core.castShadow = true; group.add(core);
+      // three lobes forming the Y footprint
+      for (let l = 0; l < 3; l++) {
+        const ang = rot + l * Math.PI * 2 / 3;
+        const lobe = new THREE.Mesh(new THREE.BoxGeometry(r * 0.55, tierH + 0.4, r * 0.9), mat);
+        lobe.position.set(cx + Math.cos(ang) * r * 0.4, y + tierH / 2, cz + Math.sin(ang) * r * 0.4);
+        lobe.rotation.y = ang; lobe.castShadow = true; group.add(lobe);
+      }
+      y += tierH;
     }
-    const spire = new THREE.Mesh(new THREE.ConeGeometry(3, 70, 8), mat);
-    spire.position.set(cx, y + 35, cz); spire.castShadow = true; scene.add(spire);
-    buildingColliders.push({ x: cx, z: cz, hx: 28, hz: 28 });
+    const spire = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 3.2, 130, 10), mat);
+    spire.position.set(cx, y + 65, cz); spire.castShadow = true; group.add(spire);
+    // beacon
+    const beacon = new THREE.Mesh(new THREE.SphereGeometry(1.6, 10, 10), new THREE.MeshBasicMaterial({ color: 0xff5a4d }));
+    beacon.position.set(cx, y + 130, cz); group.add(beacon);
+    scene.add(group);
+    buildingColliders.push({ x: cx, z: cz, hx: baseR * 0.85, hz: baseR * 0.85 });
+    return beacon;
   }
+
   const trunkMat = new THREE.MeshStandardMaterial({ color: 0x8a6a44, roughness: 0.9 });
   const leafMat = new THREE.MeshStandardMaterial({ color: 0x4c7a3a, roughness: 0.8 });
   function addPalm(cx, cz) {
@@ -242,10 +282,12 @@
     }
     g.position.set(cx, 0, cz); scene.add(g);
   }
+
+  let burjBeacon;
   for (let gx = -CITY + BLOCK; gx < CITY; gx += BLOCK) {
     for (let gz = -CITY + BLOCK; gz < CITY; gz += BLOCK) {
       const cx = gx - BLOCK / 2, cz = gz - BLOCK / 2;
-      if (Math.abs(cx) < BLOCK && Math.abs(cz) < BLOCK) { addLandmark(cx, cz); continue; }
+      if (Math.abs(cx) < BLOCK && Math.abs(cz) < BLOCK) { burjBeacon = addBurj(cx, cz); continue; }
       addBuilding(cx + (Math.random() - 0.5) * 10, cz + (Math.random() - 0.5) * 10);
       if (Math.random() < 0.35) addPalm(cx + halfLot * 0.9, cz + halfLot * 0.9);
       if (Math.random() < 0.35) addPalm(cx - halfLot * 0.9, cz - halfLot * 0.9);
@@ -277,6 +319,14 @@
 
   const player = buildCar(0xe23b3b);
   scene.add(player.group);
+  // headlights that switch on at night
+  const headSpots = [];
+  [-1.3, 1.3].forEach(x => {
+    const s = new THREE.SpotLight(0xfff2c0, 0, 130, Math.PI / 7, 0.45, 1.1);
+    s.position.set(x, 1.6, -4);
+    s.target.position.set(x, -0.3, -46);
+    player.group.add(s); player.group.add(s.target); headSpots.push(s);
+  });
 
   // ---------- Traffic ----------
   const trafficColors = [0x3a6ea5, 0xf0c33a, 0xdedede, 0x2f9e6f, 0x8a5cc7, 0xe08a3a];
@@ -285,10 +335,10 @@
   for (let i = 0; i < 16; i++) {
     const c = buildCar(trafficColors[i % trafficColors.length]);
     c.group.scale.setScalar(0.92); scene.add(c.group);
-    traffic.push({ car: c, axis: 0, coord: 0, along: 0, dir: 1, speed: 0 });
+    traffic.push({ car: c, axis: 0, coord: 0, along: 0, dir: 1, speed: 0, x: 0, z: 0 });
   }
   function placeTraffic(t) {
-    t.axis = Math.random() < 0.5 ? 0 : 1;              // 0 = runs along Z (vertical road), 1 = along X
+    t.axis = Math.random() < 0.5 ? 0 : 1;
     t.coord = roadCoords[1 + ((Math.random() * (roadCoords.length - 2)) | 0)];
     t.lane = (Math.random() < 0.5 ? -1 : 1) * ROAD_W * 0.24;
     t.dir = Math.random() < 0.5 ? 1 : -1;
@@ -311,7 +361,12 @@
     }
   }
 
-  // ---------- Checkpoints ----------
+  // ---------- Lap circuit checkpoints ----------
+  // ordered loop of road intersections (all values are in roadCoords)
+  const course = [
+    { x: 10, z: 190 }, { x: 190, z: 190 }, { x: 370, z: 10 },
+    { x: 190, z: -170 }, { x: -170, z: -170 }, { x: -350, z: 10 }, { x: -170, z: 190 }
+  ];
   const ringMat = new THREE.MeshStandardMaterial({ color: 0xffcf70, emissive: 0xffa020, emissiveIntensity: 1.3, roughness: 0.3, transparent: true, opacity: 0.95 });
   const beamMat = new THREE.MeshBasicMaterial({ color: 0xffc060, transparent: true, opacity: 0.22, depthWrite: false });
   const checkpoint = new THREE.Group();
@@ -321,32 +376,49 @@
   beam.position.y = 60; checkpoint.add(beam);
   const cpLight = new THREE.PointLight(0xffb050, 2.4, 60); cpLight.position.y = 8; checkpoint.add(cpLight);
   scene.add(checkpoint);
-  const cp = { x: 0, z: 0 };
-  function placeCheckpoint() {
-    let x, z, tries = 0;
-    do {
-      x = roadCoords[1 + ((Math.random() * (roadCoords.length - 2)) | 0)];
-      z = roadCoords[1 + ((Math.random() * (roadCoords.length - 2)) | 0)];
-      tries++;
-    } while (tries < 20 && Math.hypot(x - drive.pos.x, z - drive.pos.z) < 120);
-    cp.x = x; cp.z = z;
-    checkpoint.position.set(x, 0, z);
+  function moveCheckpoint() { const c = course[gs.cpIdx]; checkpoint.position.set(c.x, 0, c.z); }
+
+  // ---------- Drift trails ----------
+  const MARKN = 200;
+  const marks = [];
+  for (let i = 0; i < MARKN; i++) {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 2.6), new THREE.MeshBasicMaterial({ color: 0x0b0b0b, transparent: true, opacity: 0, depthWrite: false }));
+    m.rotation.x = -Math.PI / 2; m.position.y = 0.05; m.visible = false; scene.add(m);
+    marks.push({ m, life: 0 });
+  }
+  let markIdx = 0;
+  function dropMark(x, z, h) {
+    const o = marks[markIdx]; markIdx = (markIdx + 1) % MARKN;
+    o.m.position.set(x, 0.05, z); o.m.rotation.set(-Math.PI / 2, 0, h);
+    o.life = 1; o.m.visible = true; o.m.material.opacity = 0.55;
+  }
+  function fadeMarks(dt) {
+    for (const o of marks) {
+      if (o.life > 0) { o.life -= dt * 0.12; if (o.life <= 0) { o.life = 0; o.m.visible = false; } else o.m.material.opacity = o.life * 0.55; }
+    }
   }
 
   // ---------- Car physics / state ----------
-  const drive = { pos: new THREE.Vector3(10, 0, 150), heading: Math.PI, speed: 0, steer: 0 };
+  const drive = { pos: new THREE.Vector3(10, 0, 120), heading: 0, speed: 0, steer: 0 };
   const MAX_SPEED = 155, MAX_REVERSE = 45, ACCEL = 95, BRAKE = 150, DRAG = 22, CAR_HALF = 2.6;
 
-  const gs = { running: false, time: 45, cps: 0, best: Number(localStorage.getItem('dubaiDriveBest') || 0), hitCooldown: 0 };
+  function fmt(t) { const m = Math.floor(t / 60); const s = (t % 60).toFixed(1); return m + ':' + (s.length < 4 ? '0' + s : s); }
+
+  const gs = {
+    running: false, time: 45, cpIdx: 0, cpsTotal: 0, lap: 1, lapElapsed: 0,
+    bestLap: Number(localStorage.getItem('dubaiDriveBestLap') || 0),
+    hitCooldown: 0, night: 0, nightTarget: 0
+  };
 
   const keys = {};
   window.addEventListener('keydown', e => {
     const k = e.key.toLowerCase(); keys[k] = true;
+    if (k === 'n') gs.nightTarget = gs.nightTarget ? 0 : 1;
     if ([' ', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(k)) e.preventDefault();
   });
   window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
 
-  // Touch controls
+  // Touch
   const touchWrap = document.getElementById('touch');
   if (('ontouchstart' in window) || navigator.maxTouchPoints > 0) touchWrap.classList.add('enabled');
   touchWrap.querySelectorAll('.tbtn').forEach(btn => {
@@ -376,30 +448,36 @@
   const hud = document.getElementById('hud'), stats = document.getElementById('stats');
   const hint = document.getElementById('hint'), mini = document.getElementById('minimap');
   const speedVal = document.getElementById('speedVal'), gearEl = document.getElementById('gear');
-  const timerEl = document.getElementById('timer'), cpCountEl = document.getElementById('cpCount');
+  const timerEl = document.getElementById('timer');
+  const lapNumEl = document.getElementById('lapNum'), cpNumEl = document.getElementById('cpNum');
+  const lapTimeEl = document.getElementById('lapTime'), bestLapEl = document.getElementById('bestLap');
   const startScreen = document.getElementById('startScreen'), endScreen = document.getElementById('endScreen');
-  const finalCps = document.getElementById('finalCps'), bestLine = document.getElementById('bestLine');
+  const finalLaps = document.getElementById('finalLaps'), finalCps = document.getElementById('finalCps'), bestLine = document.getElementById('bestLine');
+  const dnBtn = document.getElementById('dnToggle');
   const mctx = mini.getContext('2d');
+  dnBtn.onclick = () => { gs.nightTarget = gs.nightTarget ? 0 : 1; };
 
   function startRun() {
     initAudio();
-    drive.pos.set(10, 0, 150); drive.heading = Math.PI; drive.speed = 0; drive.steer = 0;
-    gs.running = true; gs.time = 45; gs.cps = 0; gs.hitCooldown = 0;
+    drive.pos.set(10, 0, 120); drive.heading = 0; drive.speed = 0; drive.steer = 0;
+    gs.running = true; gs.time = 45; gs.cpIdx = 0; gs.cpsTotal = 0; gs.lap = 1; gs.lapElapsed = 0; gs.hitCooldown = 0;
     traffic.forEach(placeTraffic);
-    placeCheckpoint();
-    hud.style.display = 'block'; stats.style.display = 'block'; mini.style.display = 'block';
+    moveCheckpoint();
+    cpNumEl.textContent = '0/' + course.length; lapNumEl.textContent = '1';
+    bestLapEl.textContent = gs.bestLap ? fmt(gs.bestLap) : '—';
+    hud.style.display = 'block'; stats.style.display = 'block'; mini.style.display = 'block'; dnBtn.style.display = 'flex';
     hint.style.display = 'block'; hint.style.opacity = '0.6';
     startScreen.classList.add('hidden'); endScreen.classList.add('hidden');
     const behind = 15;
     camera.position.set(drive.pos.x - Math.sin(drive.heading) * behind, 7, drive.pos.z - Math.cos(drive.heading) * behind);
-    camera.lookAt(drive.pos.x, 3, drive.pos.z - 8);
-    clearTimeout(startRun._t); startRun._t = setTimeout(() => { hint.style.transition = 'opacity 1s'; hint.style.opacity = '0'; }, 6000);
+    camera.lookAt(drive.pos.x, 3, drive.pos.z + 8);
+    clearTimeout(startRun._t); startRun._t = setTimeout(() => { hint.style.transition = 'opacity 1s'; hint.style.opacity = '0'; }, 7000);
   }
   function endRun() {
     gs.running = false;
-    if (gs.cps > gs.best) { gs.best = gs.cps; localStorage.setItem('dubaiDriveBest', gs.best); }
-    finalCps.textContent = gs.cps; bestLine.textContent = 'Best: ' + gs.best;
-    hud.style.display = 'none'; stats.style.display = 'none'; mini.style.display = 'none'; hint.style.display = 'none';
+    finalLaps.textContent = (gs.lap - 1); finalCps.textContent = gs.cpsTotal;
+    bestLine.textContent = 'Best lap: ' + (gs.bestLap ? fmt(gs.bestLap) : '—');
+    hud.style.display = 'none'; stats.style.display = 'none'; mini.style.display = 'none'; dnBtn.style.display = 'none'; hint.style.display = 'none';
     endScreen.classList.remove('hidden');
     if (gain) gain.gain.value = 0;
   }
@@ -414,33 +492,49 @@
   function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); }
   addEventListener('resize', resize); resize();
 
-  // Minimap draw
+  // ---------- Day/night application ----------
+  const scratch = new THREE.Color();
+  function applyDayNight() {
+    const n = gs.night;
+    skyMat.uniforms.top.value.lerpColors(dayTop, nTop, n);
+    skyMat.uniforms.mid.value.lerpColors(dayMid, nMid, n);
+    skyMat.uniforms.bot.value.lerpColors(dayBot, nBot, n);
+    scene.background.lerpColors(dayBg, nBg, n);
+    scene.fog.color.copy(scene.background);
+    sun.intensity = L(2.2, 0.35, n); sun.color.lerpColors(daySun, nSun, n);
+    hemi.intensity = L(0.9, 0.32, n); amb.intensity = 0.28 * n;
+    headSpots.forEach(s => s.intensity = 9 * n);
+    for (const c of cityMats) c.mat.emissiveIntensity = L(c.day, c.night, n);
+    dnBtn.textContent = gs.nightTarget ? '☾' : '☀';
+  }
+
+  // Minimap
   function drawMinimap() {
     const S = 170, scale = S / (CITY * 2);
     mctx.clearRect(0, 0, S, S);
-    mctx.fillStyle = 'rgba(217,185,138,0.25)'; mctx.fillRect(0, 0, S, S);
-    // roads
-    mctx.strokeStyle = 'rgba(255,255,255,0.18)'; mctx.lineWidth = 1;
+    mctx.fillStyle = gs.night > 0.5 ? 'rgba(30,40,70,0.4)' : 'rgba(217,185,138,0.25)'; mctx.fillRect(0, 0, S, S);
+    mctx.strokeStyle = 'rgba(255,255,255,0.16)'; mctx.lineWidth = 1;
     roadCoords.forEach(pos => {
       const p = (pos + CITY) * scale;
       mctx.beginPath(); mctx.moveTo(p, 0); mctx.lineTo(p, S); mctx.stroke();
       mctx.beginPath(); mctx.moveTo(0, p); mctx.lineTo(S, p); mctx.stroke();
     });
     const toMap = (x, z) => [(x + CITY) * scale, (z + CITY) * scale];
-    // landmark
     const [lx, lz] = toMap(0, 0);
     mctx.fillStyle = '#dfe8f0'; mctx.fillRect(lx - 3, lz - 3, 6, 6);
-    // traffic
+    // course path
+    mctx.strokeStyle = 'rgba(255,207,112,0.4)'; mctx.lineWidth = 1.5; mctx.beginPath();
+    course.forEach((c, i) => { const [x, y] = toMap(c.x, c.z); i ? mctx.lineTo(x, y) : mctx.moveTo(x, y); });
+    mctx.closePath(); mctx.stroke();
+    course.forEach((c, i) => { const [x, y] = toMap(c.x, c.z); mctx.beginPath(); mctx.arc(x, y, 2, 0, 7); mctx.fillStyle = 'rgba(255,207,112,0.6)'; mctx.fill(); });
     mctx.fillStyle = 'rgba(120,180,255,0.9)';
     traffic.forEach(t => { const [x, y] = toMap(t.x, t.z); mctx.fillRect(x - 1.3, y - 1.3, 2.6, 2.6); });
-    // checkpoint (pulsing)
-    const [cx, cy] = toMap(cp.x, cp.z);
+    const act = course[gs.cpIdx]; const [cx, cy] = toMap(act.x, act.z);
     const pr = 4 + Math.sin(performance.now() * 0.006) * 1.6;
     mctx.beginPath(); mctx.arc(cx, cy, pr, 0, 7); mctx.fillStyle = '#ffcf70'; mctx.fill();
-    // player arrow
     const [px, py] = toMap(drive.pos.x, drive.pos.z);
     mctx.save(); mctx.translate(px, py); mctx.rotate(-drive.heading);
-    mctx.beginPath(); mctx.moveTo(0, -6); mctx.lineTo(4, 5); mctx.lineTo(-4, 5); mctx.closePath();
+    mctx.beginPath(); mctx.moveTo(0, 6); mctx.lineTo(4, -5); mctx.lineTo(-4, -5); mctx.closePath();
     mctx.fillStyle = '#ff5a4d'; mctx.fill(); mctx.restore();
   }
 
@@ -449,12 +543,18 @@
     requestAnimationFrame(tick);
     const dt = Math.min(clock.getDelta(), 0.05);
 
+    // day/night lerp always
+    gs.night += (gs.nightTarget - gs.night) * Math.min(1, dt * 2.2);
+    applyDayNight();
+    if (burjBeacon) burjBeacon.visible = (Math.floor(clock.elapsedTime * 1.5) % 2 === 0);
+    fadeMarks(dt);
+
     if (gs.running) {
-      // timer
-      gs.time -= dt;
+      gs.time -= dt; gs.lapElapsed += dt;
       if (gs.time <= 0) { gs.time = 0; endRun(); }
       timerEl.innerHTML = gs.time.toFixed(1) + '<small>s</small>';
       timerEl.classList.toggle('warn', gs.time < 10);
+      lapTimeEl.textContent = fmt(gs.lapElapsed);
 
       const fwd = keys['w'] || keys['arrowup'], back = keys['s'] || keys['arrowdown'];
       const left = keys['a'] || keys['arrowleft'], right = keys['d'] || keys['arrowright'], hand = keys[' '];
@@ -485,7 +585,6 @@
       if (gs.hitCooldown === 0) {
         for (const t of traffic) {
           if (Math.abs(t.x - drive.pos.x) < HALF.x + CAR_HALF && Math.abs(t.z - drive.pos.z) < HALF.z + CAR_HALF) {
-            // shove player back, kill speed, flash, small time penalty
             drive.pos.x -= Math.sin(drive.heading) * 5; drive.pos.z -= Math.cos(drive.heading) * 5;
             drive.speed = -drive.speed * 0.25; gs.hitCooldown = 0.8; gs.time = Math.max(0, gs.time - 2);
             document.body.classList.add('flash'); setTimeout(() => document.body.classList.remove('flash'), 350);
@@ -494,32 +593,48 @@
         }
       }
 
-      // checkpoint pickup
-      ring.rotation.z += dt * 1.5;
-      if (Math.hypot(cp.x - drive.pos.x, cp.z - drive.pos.z) < 11) {
-        gs.cps++; gs.time += 10; cpCountEl.textContent = gs.cps;
-        placeCheckpoint();
+      // drift trails — when sliding: handbrake at speed, or hard steer at high speed
+      const drifting = (hand && Math.abs(drive.speed) > 22) || (Math.abs(steerInput) > 0 && Math.abs(drive.speed) > 95);
+      if (drifting) {
+        const cosH = Math.cos(drive.heading), sinH = Math.sin(drive.heading);
+        [-2.1, 2.1].forEach(lx => {
+          const wx = drive.pos.x + cosH * lx + sinH * -2.6;
+          const wz = drive.pos.z - sinH * lx + cosH * -2.6;
+          dropMark(wx, wz, drive.heading);
+        });
       }
 
-      // apply to car mesh
+      // checkpoint / lap logic
+      ring.rotation.z += dt * 1.5;
+      const act = course[gs.cpIdx];
+      if (Math.hypot(act.x - drive.pos.x, act.z - drive.pos.z) < 11) {
+        gs.cpsTotal++; gs.time += 8; gs.cpIdx++;
+        if (gs.cpIdx >= course.length) {
+          gs.cpIdx = 0; gs.lap++;
+          if (!gs.bestLap || gs.lapElapsed < gs.bestLap) { gs.bestLap = gs.lapElapsed; localStorage.setItem('dubaiDriveBestLap', gs.bestLap.toFixed(2)); }
+          gs.lapElapsed = 0;
+          lapNumEl.textContent = gs.lap; bestLapEl.textContent = fmt(gs.bestLap);
+        }
+        cpNumEl.textContent = gs.cpIdx + '/' + course.length;
+        moveCheckpoint();
+      }
+
       player.group.position.copy(drive.pos);
       player.group.rotation.y = drive.heading;
       const spin = drive.speed * dt * 0.9;
-      player.wheels.forEach((w, i) => { w.rotation.x += spin; if (i < 2) w.rotation.y = drive.steer; });
+      player.wheels.forEach((w, i) => { w.rotation.x += spin; if (i >= 2) w.rotation.y = drive.steer; });
       player.chassis.rotation.z = -drive.steer * 0.08 * speedFactor;
       player.cabin.rotation.z = -drive.steer * 0.08 * speedFactor;
 
       speedVal.textContent = Math.abs(Math.round(drive.speed * 1.6));
       gearEl.textContent = drive.speed < -0.5 ? 'Reverse' : (hand ? 'Handbrake' : 'Drive');
 
-      // audio
       if (gain && osc) {
         const sf = Math.abs(drive.speed) / MAX_SPEED;
         osc.frequency.setTargetAtTime(48 + sf * 190, actx.currentTime, 0.05);
         gain.gain.setTargetAtTime(0.03 + sf * 0.05, actx.currentTime, 0.08);
       }
 
-      // chase cam
       const behind = 15 + Math.abs(drive.speed) * 0.05;
       camera.position.lerp(new THREE.Vector3(
         drive.pos.x - Math.sin(drive.heading) * behind,
@@ -539,7 +654,8 @@
 
     renderer.render(scene, camera);
   }
-  placeCheckpoint();
+  moveCheckpoint();
+  applyDayNight();
   tick();
 })();
 </script>
