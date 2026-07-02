@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Nebula Run — 3D Game</title>
+<style>
+  :root {
+    --warm: #ffb877;
+    --hot: #ff7a45;
+    --cool: #6ea8ff;
+    --ink: #0a0713;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; overflow: hidden; background: var(--ink); }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #fff;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: none;
+  }
+  #game { position: fixed; inset: 0; display: block; }
+
+  .hud {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    padding: 18px 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    pointer-events: none;
+    z-index: 5;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.6);
+  }
+  .hud .score { font-size: 30px; font-weight: 700; letter-spacing: 0.5px; }
+  .hud .score small { display: block; font-size: 12px; font-weight: 500; opacity: 0.6; letter-spacing: 2px; text-transform: uppercase; }
+  .hud .lives { font-size: 26px; letter-spacing: 4px; }
+
+  .overlay {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    background: radial-gradient(circle at 50% 40%, rgba(30,15,40,0.55), rgba(5,3,10,0.92));
+    backdrop-filter: blur(3px);
+    z-index: 10;
+    padding: 24px;
+  }
+  .overlay.hidden { display: none; }
+  .overlay h1 {
+    font-size: clamp(38px, 9vw, 76px);
+    font-weight: 800;
+    letter-spacing: -1px;
+    background: linear-gradient(120deg, var(--warm), var(--hot) 55%, var(--cool));
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 6px;
+  }
+  .overlay p { font-size: 16px; opacity: 0.75; max-width: 420px; line-height: 1.55; margin-bottom: 26px; }
+  .overlay .big { font-size: 22px; opacity: 0.95; margin-bottom: 10px; }
+  .btn {
+    pointer-events: auto;
+    cursor: pointer;
+    border: none;
+    padding: 15px 40px;
+    font-size: 17px; font-weight: 700;
+    color: var(--ink);
+    background: linear-gradient(120deg, var(--warm), var(--hot));
+    border-radius: 100px;
+    box-shadow: 0 10px 40px rgba(255,122,69,0.35);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .btn:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 14px 50px rgba(255,122,69,0.5); }
+  .btn:active { transform: translateY(0) scale(0.98); }
+  .keys { margin-top: 26px; font-size: 13px; opacity: 0.5; letter-spacing: 0.5px; }
+  .keys kbd {
+    display: inline-block; padding: 3px 9px; margin: 0 2px;
+    border: 1px solid rgba(255,255,255,0.25); border-radius: 6px;
+    font-family: inherit; font-size: 12px;
+  }
+  .flash { animation: flash 0.4s ease; }
+  @keyframes flash { 0% { opacity: 1; } 50% { opacity: 0.15; } 100% { opacity: 1; } }
+</style>
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <div class="hud" id="hud" style="display:none">
+    <div class="score"><span id="scoreVal">0</span><small>Distance</small></div>
+    <div class="lives" id="lives">♥♥♥</div>
+  </div>
+
+  <div class="overlay" id="startScreen">
+    <h1>Nebula Run</h1>
+    <p>Pilot your ship through the drifting nebula. Grab the glowing <strong>orbs</strong>, dodge the <strong>asteroids</strong>. It only gets faster.</p>
+    <button class="btn" id="startBtn">Launch</button>
+    <div class="keys">
+      Move with <kbd>←</kbd> <kbd>→</kbd> <kbd>↑</kbd> <kbd>↓</kbd> or <kbd>WASD</kbd> · or just move your mouse / finger
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="endScreen">
+    <h1>Run Over</h1>
+    <div class="big">Distance: <span id="finalScore">0</span></div>
+    <p id="bestLine">Best: 0</p>
+    <button class="btn" id="againBtn">Fly Again</button>
+  </div>
+
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+<script>
+(function () {
+  const THREE = window.THREE;
+
+  // ---------- Scene setup ----------
+  const canvas = document.getElementById('game');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x0a0713, 0.018);
+
+  const camera = new THREE.PerspectiveCamera(70, 1, 0.1, 400);
+  camera.position.set(0, 0, 8);
+
+  // Lights
+  scene.add(new THREE.AmbientLight(0x442255, 1.1));
+  const key = new THREE.DirectionalLight(0xffb877, 1.6);
+  key.position.set(3, 5, 6);
+  scene.add(key);
+  const rim = new THREE.PointLight(0x6ea8ff, 2.2, 60);
+  rim.position.set(-6, -3, 4);
+  scene.add(rim);
+
+  // ---------- Nebula background (points) ----------
+  const NEB = 1400;
+  const nebGeo = new THREE.BufferGeometry();
+  const nebPos = new Float32Array(NEB * 3);
+  const nebCol = new Float32Array(NEB * 3);
+  const cA = new THREE.Color(0xffb877), cB = new THREE.Color(0x6ea8ff), cC = new THREE.Color(0xff7a45);
+  for (let i = 0; i < NEB; i++) {
+    nebPos[i*3]   = (Math.random() - 0.5) * 120;
+    nebPos[i*3+1] = (Math.random() - 0.5) * 80;
+    nebPos[i*3+2] = -Math.random() * 300 - 10;
+    const t = Math.random();
+    const c = t < 0.4 ? cA : (t < 0.7 ? cC : cB);
+    nebCol[i*3] = c.r; nebCol[i*3+1] = c.g; nebCol[i*3+2] = c.b;
+  }
+  nebGeo.setAttribute('position', new THREE.BufferAttribute(nebPos, 3));
+  nebGeo.setAttribute('color', new THREE.BufferAttribute(nebCol, 3));
+  // soft round glow sprite so dust reads as light, not squares
+  function makeGlowTexture() {
+    const c = document.createElement('canvas'); c.width = c.height = 64;
+    const g = c.getContext('2d');
+    const grad = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    grad.addColorStop(0, 'rgba(255,255,255,1)');
+    grad.addColorStop(0.25, 'rgba(255,255,255,0.85)');
+    grad.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = grad; g.fillRect(0, 0, 64, 64);
+    const t = new THREE.CanvasTexture(c); t.needsUpdate = true; return t;
+  }
+  const glowTex = makeGlowTexture();
+  const nebMat = new THREE.PointsMaterial({ size: 2.2, map: glowTex, vertexColors: true, transparent: true, opacity: 0.9, depthWrite: false, blending: THREE.AdditiveBlending });
+  const nebula = new THREE.Points(nebGeo, nebMat);
+  scene.add(nebula);
+
+  // ---------- Player ship ----------
+  const ship = new THREE.Group();
+  const bodyMat = new THREE.MeshStandardMaterial({ color: 0xffd9b0, metalness: 0.4, roughness: 0.35, emissive: 0xff7a45, emissiveIntensity: 0.25 });
+  const hull = new THREE.Mesh(new THREE.ConeGeometry(0.55, 1.8, 5), bodyMat);
+  hull.rotation.x = Math.PI / 2;
+  ship.add(hull);
+  const wingMat = new THREE.MeshStandardMaterial({ color: 0x6ea8ff, metalness: 0.5, roughness: 0.4, emissive: 0x2255aa, emissiveIntensity: 0.4 });
+  const wing = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.08, 0.5), wingMat);
+  wing.position.z = 0.3;
+  ship.add(wing);
+  // engine glow
+  const glow = new THREE.Mesh(new THREE.SphereGeometry(0.28, 12, 12), new THREE.MeshBasicMaterial({ color: 0xffe0a0 }));
+  glow.position.z = 0.95;
+  ship.add(glow);
+  const glowLight = new THREE.PointLight(0xffb877, 2, 8);
+  glowLight.position.z = 1.2;
+  ship.add(glowLight);
+  scene.add(ship);
+
+  // ---------- Object pools ----------
+  const BOUND_X = 9, BOUND_Y = 6;
+  const asteroids = [];
+  const orbs = [];
+
+  function makeAsteroid() {
+    const r = 0.6 + Math.random() * 1.1;
+    const geo = new THREE.IcosahedronGeometry(r, 0);
+    // rough it up
+    const p = geo.attributes.position;
+    for (let i = 0; i < p.count; i++) {
+      p.setXYZ(i, p.getX(i)*(0.8+Math.random()*0.4), p.getY(i)*(0.8+Math.random()*0.4), p.getZ(i)*(0.8+Math.random()*0.4));
+    }
+    geo.computeVertexNormals();
+    const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: 0xc9a98f, roughness: 0.85, metalness: 0.1, emissive: 0x5a3a2a, emissiveIntensity: 0.5, flatShading: true }));
+    m.userData = { radius: r, spin: new THREE.Vector3(Math.random()*0.04, Math.random()*0.04, Math.random()*0.04) };
+    return m;
+  }
+  function makeOrb() {
+    const m = new THREE.Mesh(
+      new THREE.SphereGeometry(0.42, 16, 16),
+      new THREE.MeshStandardMaterial({ color: 0xffe08a, emissive: 0xffb050, emissiveIntensity: 1.4, roughness: 0.2 })
+    );
+    const l = new THREE.PointLight(0xffcf70, 1.6, 6);
+    m.add(l);
+    m.userData = { radius: 0.42 };
+    return m;
+  }
+
+  function spawn() {
+    const isOrb = Math.random() < 0.32;
+    const obj = isOrb ? makeOrb() : makeAsteroid();
+    obj.position.set(
+      (Math.random() - 0.5) * BOUND_X * 2,
+      (Math.random() - 0.5) * BOUND_Y * 2,
+      -120 - Math.random() * 40
+    );
+    scene.add(obj);
+    (isOrb ? orbs : asteroids).push(obj);
+  }
+
+  // ---------- Game state ----------
+  const state = {
+    running: false,
+    score: 0,
+    lives: 3,
+    speed: 45,
+    best: Number(localStorage.getItem('nebulaRunBest') || 0),
+    invuln: 0,
+    target: new THREE.Vector2(0, 0),
+  };
+
+  const hud = document.getElementById('hud');
+  const scoreVal = document.getElementById('scoreVal');
+  const livesEl = document.getElementById('lives');
+  const startScreen = document.getElementById('startScreen');
+  const endScreen = document.getElementById('endScreen');
+  const finalScore = document.getElementById('finalScore');
+  const bestLine = document.getElementById('bestLine');
+
+  function reset() {
+    [...asteroids, ...orbs].forEach(o => scene.remove(o));
+    asteroids.length = 0; orbs.length = 0;
+    state.score = 0; state.lives = 3; state.speed = 45; state.invuln = 0;
+    state.target.set(0, 0);
+    ship.position.set(0, 0, 0);
+    for (let i = 0; i < 14; i++) spawn();
+    updateHud();
+  }
+  function updateHud() {
+    scoreVal.textContent = Math.floor(state.score);
+    livesEl.textContent = '♥'.repeat(state.lives) + '<span style="opacity:.25">♥</span>'.repeat(Math.max(0, 3 - state.lives));
+    livesEl.innerHTML = '<span style="color:#ff7a45">' + '♥'.repeat(state.lives) + '</span>' + '<span style="opacity:.2">' + '♥'.repeat(Math.max(0,3-state.lives)) + '</span>';
+  }
+
+  function start() {
+    reset();
+    state.running = true;
+    hud.style.display = 'flex';
+    startScreen.classList.add('hidden');
+    endScreen.classList.add('hidden');
+  }
+  function gameOver() {
+    state.running = false;
+    hud.style.display = 'none';
+    finalScore.textContent = Math.floor(state.score);
+    if (state.score > state.best) {
+      state.best = Math.floor(state.score);
+      localStorage.setItem('nebulaRunBest', state.best);
+    }
+    bestLine.textContent = 'Best: ' + Math.floor(state.best);
+    endScreen.classList.remove('hidden');
+  }
+  function hit() {
+    if (state.invuln > 0) return;
+    state.lives--;
+    state.invuln = 1.2;
+    document.body.classList.add('flash');
+    setTimeout(() => document.body.classList.remove('flash'), 400);
+    updateHud();
+    if (state.lives <= 0) gameOver();
+  }
+
+  document.getElementById('startBtn').onclick = start;
+  document.getElementById('againBtn').onclick = start;
+
+  // ---------- Controls ----------
+  const keys = {};
+  window.addEventListener('keydown', e => { keys[e.key.toLowerCase()] = true; });
+  window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+
+  function pointerMove(clientX, clientY) {
+    const nx = (clientX / window.innerWidth) * 2 - 1;
+    const ny = -((clientY / window.innerHeight) * 2 - 1);
+    state.target.set(nx * BOUND_X, ny * BOUND_Y);
+  }
+  window.addEventListener('mousemove', e => { if (state.running) pointerMove(e.clientX, e.clientY); });
+  window.addEventListener('touchmove', e => {
+    if (state.running && e.touches[0]) { pointerMove(e.touches[0].clientX, e.touches[0].clientY); e.preventDefault(); }
+  }, { passive: false });
+
+  // ---------- Resize ----------
+  function resize() {
+    const w = window.innerWidth, h = window.innerHeight;
+    renderer.setSize(w, h);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // ---------- Loop ----------
+  const clock = new THREE.Clock();
+  function tick() {
+    requestAnimationFrame(tick);
+    const dt = Math.min(clock.getDelta(), 0.05);
+
+    nebula.rotation.z += dt * 0.01;
+
+    if (state.running) {
+      state.score += dt * state.speed * 0.35;
+      state.speed += dt * 1.4; // ramp difficulty
+      state.invuln = Math.max(0, state.invuln - dt);
+
+      // Keyboard steering toward-target adjust
+      const kSpeed = 14 * dt;
+      if (keys['arrowleft'] || keys['a']) state.target.x -= kSpeed;
+      if (keys['arrowright'] || keys['d']) state.target.x += kSpeed;
+      if (keys['arrowup'] || keys['w']) state.target.y += kSpeed;
+      if (keys['arrowdown'] || keys['s']) state.target.y -= kSpeed;
+      state.target.x = Math.max(-BOUND_X, Math.min(BOUND_X, state.target.x));
+      state.target.y = Math.max(-BOUND_Y, Math.min(BOUND_Y, state.target.y));
+
+      // Smoothly move ship
+      ship.position.x += (state.target.x - ship.position.x) * Math.min(1, dt * 8);
+      ship.position.y += (state.target.y - ship.position.y) * Math.min(1, dt * 8);
+      // bank/tilt
+      ship.rotation.z = (state.target.x - ship.position.x) * -0.15;
+      ship.rotation.x = (state.target.y - ship.position.y) * 0.12;
+      glow.scale.setScalar(1 + Math.sin(clock.elapsedTime * 20) * 0.15);
+
+      // blink while invulnerable
+      ship.visible = state.invuln > 0 ? (Math.floor(clock.elapsedTime * 12) % 2 === 0) : true;
+
+      const dz = state.speed * dt;
+      const shipR = 0.8;
+
+      // asteroids
+      for (let i = asteroids.length - 1; i >= 0; i--) {
+        const a = asteroids[i];
+        a.position.z += dz;
+        a.rotation.x += a.userData.spin.x; a.rotation.y += a.userData.spin.y; a.rotation.z += a.userData.spin.z;
+        if (a.position.z > 12) { scene.remove(a); asteroids.splice(i, 1); spawn(); continue; }
+        if (Math.abs(a.position.z - ship.position.z) < 1.5) {
+          const dx = a.position.x - ship.position.x, dy = a.position.y - ship.position.y;
+          if (Math.hypot(dx, dy) < a.userData.radius + shipR) {
+            scene.remove(a); asteroids.splice(i, 1); spawn(); hit();
+          }
+        }
+      }
+      // orbs
+      for (let i = orbs.length - 1; i >= 0; i--) {
+        const o = orbs[i];
+        o.position.z += dz;
+        o.rotation.y += dt * 2;
+        if (o.position.z > 12) { scene.remove(o); orbs.splice(i, 1); spawn(); continue; }
+        if (Math.abs(o.position.z - ship.position.z) < 1.6) {
+          const dx = o.position.x - ship.position.x, dy = o.position.y - ship.position.y;
+          if (Math.hypot(dx, dy) < o.userData.radius + shipR + 0.4) {
+            state.score += 25;
+            scene.remove(o); orbs.splice(i, 1); spawn();
+          }
+        }
+      }
+
+      updateHud();
+    } else {
+      // idle drift on menus
+      ship.rotation.y += dt * 0.4;
+      ship.position.y = Math.sin(clock.elapsedTime) * 0.3;
+    }
+
+    // camera gentle follow
+    camera.position.x += (ship.position.x * 0.3 - camera.position.x) * 0.05;
+    camera.position.y += (ship.position.y * 0.3 - camera.position.y) * 0.05;
+    camera.lookAt(ship.position.x * 0.5, ship.position.y * 0.5, -10);
+
+    renderer.render(scene, camera);
+  }
+
+  reset();
+  state.running = false;
+  hud.style.display = 'none';
+  bestLine.textContent = 'Best: ' + Math.floor(state.best);
+  tick();
+})();
+</script>
+</body>
+</html>
