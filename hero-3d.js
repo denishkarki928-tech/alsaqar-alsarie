@@ -119,9 +119,9 @@ import * as THREE from 'https://unpkg.com/three@0.160.1/build/three.module.js';
   // painted from the brand palette, and using normal blending so it reads on
   // the cream background as well as in dark mode. Shares this scene + renderer.
   var PARTICLE_COUNT = isSmallScreen ? 2600 : 8000;
-  var NEB_SCALE  = 6.6;   // core radius, sized to fill the hero at z~0
-  var NEB_MORPH  = 1.5;   // harmonic displacement depth
-  var NEB_CHAOS  = 0.55;  // fine turbulence
+  var NEB_SCALE  = 9.6;   // core radius — big enough to fill the viewport
+  var NEB_MORPH  = 2.3;   // harmonic displacement depth
+  var NEB_CHAOS  = 0.8;   // fine turbulence
   var NEB_SWIRL  = 1.35;  // differential rotation strength
   var NEB_SPEED  = 0.32;  // flow speed
   var NEB_Z      = -3;    // pushed slightly back so glass shapes float ahead
@@ -154,11 +154,15 @@ import * as THREE from 'https://unpkg.com/three@0.160.1/build/three.module.js';
   var nebBright = new Float32Array(PARTICLE_COUNT);
   var GOLDEN = 2.399963229728653; // pi * (3 - sqrt(5))
 
+  // Pull every mote toward a warm amber so the whole swarm glows golden-orange
+  // regardless of which palette entry it started from.
+  var WARM = new THREE.Color('#F4A63C');
   function paintParticleColors(){
     var pal = readPalette();
     var tmp = new THREE.Color();
     for (var i = 0; i < PARTICLE_COUNT; i++){
       tmp.set(pal[i % pal.length]);
+      tmp.lerp(WARM, 0.42);
       var b = nebBright[i];
       partColor[i*3]   = tmp.r * b;
       partColor[i*3+1] = tmp.g * b;
@@ -181,7 +185,7 @@ import * as THREE from 'https://unpkg.com/three@0.160.1/build/three.module.js';
   paintParticleColors();
 
   var partMat = new THREE.PointsMaterial({
-    size: isSmallScreen ? 0.11 : 0.09,
+    size: isSmallScreen ? 0.14 : 0.12,
     map: makeSpriteTexture(),
     vertexColors: true,
     transparent: true,
@@ -198,6 +202,19 @@ import * as THREE from 'https://unpkg.com/three@0.160.1/build/three.module.js';
   var pointer = { x: 0, y: 0 };
   var targetRotX = 0, targetRotY = 0;
   var targetPanX = 0, targetPanY = 0;
+
+  // Scroll drift: the fixed canvas would otherwise sit still while the page
+  // moves, so tie the swarm's rotation and vertical drift to scroll progress —
+  // it turns roughly one full revolution and rises as you travel down the page.
+  var scrollRotY = 0, scrollPanY = 0;
+  function onScroll(){
+    var max = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
+    var progress = Math.min(Math.max(window.scrollY / max, 0), 1);
+    scrollRotY = progress * Math.PI * 2;
+    scrollPanY = progress * 3.5; // gentle drift — keeps the swarm covering lower sections
+    if (reduceMotion && running) renderFrame(); // keep parallax for reduced-motion
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
 
   function onPointerMove(e){
     // Canvas is now a fixed full-viewport layer, so normalize against the
@@ -253,10 +270,10 @@ import * as THREE from 'https://unpkg.com/three@0.160.1/build/three.module.js';
     }
     partGeo.attributes.position.needsUpdate = true;
 
-    group.rotation.y += (targetRotY - group.rotation.y) * 0.04;
+    group.rotation.y += ((targetRotY + scrollRotY) - group.rotation.y) * 0.04;
     group.rotation.x += (targetRotX - group.rotation.x) * 0.04;
     group.position.x += (targetPanX - group.position.x) * 0.03;
-    group.position.y += (targetPanY - group.position.y) * 0.03;
+    group.position.y += ((targetPanY + scrollPanY) - group.position.y) * 0.03;
     renderer.render(scene, camera);
   }
 
@@ -282,6 +299,7 @@ import * as THREE from 'https://unpkg.com/three@0.160.1/build/three.module.js';
   // The canvas backs the whole page now, so run continuously — only pause
   // when the tab is hidden to save the battery.
   start();
+  onScroll(); // seed drift from the current scroll position (e.g. on refresh)
 
   document.addEventListener('visibilitychange', function(){
     if (document.hidden) stop(); else if (!reduceMotion) start();
