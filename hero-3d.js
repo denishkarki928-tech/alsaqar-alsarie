@@ -199,6 +199,78 @@ import * as THREE from 'https://unpkg.com/three@0.160.1/build/three.module.js';
   group.add(particles); // inherits the same cursor parallax as the shapes
   // --------------------------------------------------------------------------
 
+  // --- Ambient dust field ----------------------------------------------------
+  // The sculptural nebula rotates with scroll, so some viewport regions fall
+  // bare on the lower sections. This second field is a wide, gently drifting
+  // warm haze added straight to the scene (NOT the rotating group), so it
+  // always fills the frame — guaranteeing particles across the whole page.
+  var DUST_COUNT = isSmallScreen ? 2400 : 6500;
+  var DUST_X = 22, DUST_Y = 16;          // wide enough to cover the viewport
+  var DUST_Z_NEAR = -4, DUST_Z_FAR = -13;
+  var dustGeo = new THREE.BufferGeometry();
+  var dustPos = new Float32Array(DUST_COUNT * 3);
+  var dustColor = new Float32Array(DUST_COUNT * 3);
+  var dustDrift = new Float32Array(DUST_COUNT);
+  var dustSwayAmp = new Float32Array(DUST_COUNT);
+  var dustSwaySpeed = new Float32Array(DUST_COUNT);
+  var dustPhase = new Float32Array(DUST_COUNT);
+  var dustBaseX = new Float32Array(DUST_COUNT);
+  var dustBright = new Float32Array(DUST_COUNT);
+
+  // Bright amber glows on the dark theme; a deeper amber is needed on the
+  // cream theme or the motes wash out and read as bare background.
+  var WARM_DEEP = new THREE.Color('#9C5A16');
+  function paintDustColors(){
+    var pal = readPalette();
+    var isDark = document.documentElement.classList.contains('dark');
+    var warmT = isDark ? WARM : WARM_DEEP;
+    var mix = isDark ? 0.5 : 0.8;
+    var bScale = isDark ? 1.0 : 0.6;
+    var tmp = new THREE.Color();
+    for (var i = 0; i < DUST_COUNT; i++){
+      tmp.set(pal[i % pal.length]);
+      tmp.lerp(warmT, mix);
+      var b = dustBright[i] * bScale;
+      dustColor[i*3]   = tmp.r * b;
+      dustColor[i*3+1] = tmp.g * b;
+      dustColor[i*3+2] = tmp.b * b;
+    }
+    if (dustGeo.attributes.color) dustGeo.attributes.color.needsUpdate = true;
+  }
+
+  for (var q = 0; q < DUST_COUNT; q++){
+    var qx = rand(-DUST_X, DUST_X);
+    dustPos[q*3]   = qx;
+    dustPos[q*3+1] = rand(-DUST_Y, DUST_Y);
+    dustPos[q*3+2] = rand(DUST_Z_FAR, DUST_Z_NEAR);
+    dustBaseX[q] = qx;
+    dustDrift[q] = rand(0.25, 0.8);
+    dustSwayAmp[q] = rand(0.2, 0.8);
+    dustSwaySpeed[q] = rand(0.15, 0.4);
+    dustPhase[q] = rand(0, Math.PI * 2);
+    dustBright[q] = rand(0.5, 0.95);
+  }
+  dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPos, 3));
+  dustGeo.setAttribute('color', new THREE.BufferAttribute(dustColor, 3));
+  paintDustColors();
+
+  var dustMat = new THREE.PointsMaterial({
+    // Spread thinly over a large volume, so motes need to be much larger than
+    // the tightly-packed nebula's to actually read on screen.
+    size: isSmallScreen ? 0.55 : 0.42,
+    map: makeSpriteTexture(),
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.85,
+    depthWrite: false,
+    blending: THREE.NormalBlending,
+    sizeAttenuation: true,
+    fog: false // ignore scene fog, or distant motes wash out to the background
+  });
+  var dustField = new THREE.Points(dustGeo, dustMat);
+  scene.add(dustField); // added to scene, not group — stays put, always fills
+  // --------------------------------------------------------------------------
+
   var pointer = { x: 0, y: 0 };
   var targetRotX = 0, targetRotY = 0;
   var targetPanX = 0, targetPanY = 0;
@@ -270,6 +342,21 @@ import * as THREE from 'https://unpkg.com/three@0.160.1/build/three.module.js';
     }
     partGeo.attributes.position.needsUpdate = true;
 
+    // Ambient dust: slow upward drift + lateral sway, wrapping at the top so
+    // the frame never empties out.
+    var da = dustGeo.attributes.position.array;
+    var dustTop = DUST_Y + 2;
+    for (var m = 0; m < DUST_COUNT; m++){
+      var my = m*3 + 1;
+      da[my] += dustDrift[m] * 0.015;
+      if (da[my] > dustTop){
+        da[my] = -dustTop;
+        dustBaseX[m] = rand(-DUST_X, DUST_X);
+      }
+      da[m*3] = dustBaseX[m] + Math.sin(t * dustSwaySpeed[m] + dustPhase[m]) * dustSwayAmp[m];
+    }
+    dustGeo.attributes.position.needsUpdate = true;
+
     group.rotation.y += ((targetRotY + scrollRotY) - group.rotation.y) * 0.04;
     group.rotation.x += (targetRotX - group.rotation.x) * 0.04;
     group.position.x += (targetPanX - group.position.x) * 0.03;
@@ -317,6 +404,7 @@ import * as THREE from 'https://unpkg.com/three@0.160.1/build/three.module.js';
     });
     scene.fog.color.set(cssVar('--bg', '#FBF2E4'));
     paintParticleColors();
+    paintDustColors();
     if (reduceMotion) renderFrame();
   });
   themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
