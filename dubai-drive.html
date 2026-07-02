@@ -83,9 +83,9 @@
   .overlay .big b { color: #ffd28a; }
 
   .pick { font-size: 12px; letter-spacing: 3px; text-transform: uppercase; opacity: 0.5; margin-bottom: 12px; }
-  .drivers { display: flex; gap: 14px; margin-bottom: 26px; flex-wrap: wrap; justify-content: center; }
+  .drivers { display: flex; gap: 12px; margin: 0 auto 22px; flex-wrap: wrap; justify-content: center; max-width: 660px; max-height: 52vh; overflow-y: auto; }
   .dcard {
-    pointer-events: auto; cursor: pointer; width: 148px; padding: 16px 14px;
+    pointer-events: auto; cursor: pointer; width: 124px; padding: 13px 12px;
     border-radius: 16px; border: 2px solid rgba(255,255,255,0.14);
     background: rgba(255,255,255,0.05); transition: all 0.15s ease; text-align: center;
   }
@@ -446,9 +446,15 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
   // ---------- Drivers & cars ----------
   const DRIVERS = [
-    { name: 'Denish', car: 'Ferrari',     cls: 'ferrari', em: '🧑🏻‍✈️', color: 0xd8000f, trim: 0x151515, glass: 0x0a0f16, profile: 'wedge', spoiler: 'lip',  maxSpeed: 166, accel: 108, grip: 1.02, shirt: 0xd8000f, spd: 0.88, acc: 0.92, hnd: 0.78 },
-    { name: 'Kusum',  car: 'Lamborghini', cls: 'lambo',   em: '👩🏻', color: 0xf5c518, trim: 0x1a1a1a, glass: 0x0a0f16, profile: 'wedge', spoiler: 'wing', maxSpeed: 180, accel: 102, grip: 0.9,  shirt: 0xf5c518, spd: 1.0,  acc: 0.86, hnd: 0.7 },
-    { name: 'Chuden', car: 'BMW',         cls: 'bmw',     em: '🧑🏽', color: 0x1c69d4, trim: 0xd8dde3, glass: 0x0a0f16, profile: 'coupe', spoiler: 'none', maxSpeed: 152, accel: 100, grip: 1.18, shirt: 0x1c69d4, spd: 0.74, acc: 0.82, hnd: 0.98 }
+    { name: 'Denish',  car: 'Ferrari',       em: '🧑🏻‍✈️', color: 0xd8000f, tint: '#ff5b52', maxSpeed: 166, accel: 108, grip: 1.02, shirt: 0xd8000f, spd: 0.88, acc: 0.92, hnd: 0.78 },
+    { name: 'Kusum',   car: 'Lamborghini',   em: '👩🏻',    color: 0xf5c518, tint: '#ffd23a', maxSpeed: 180, accel: 102, grip: 0.90, shirt: 0xf5c518, spd: 1.00, acc: 0.86, hnd: 0.70 },
+    { name: 'Chuden',  car: 'BMW',           em: '🧑🏽',    color: 0x1c69d4, tint: '#6aa8ff', maxSpeed: 152, accel: 100, grip: 1.18, shirt: 0x1c69d4, spd: 0.74, acc: 0.82, hnd: 0.98 },
+    { name: 'Dina',    car: 'Mercedes',      em: '👩🏽',    color: 0x00c9b7, tint: '#1fd4c4', maxSpeed: 172, accel: 106, grip: 1.05, shirt: 0x00c9b7, spd: 0.92, acc: 0.90, hnd: 0.85 },
+    { name: 'Bipana',  car: 'McLaren',       em: '👩🏻‍🦰', color: 0xff6a00, tint: '#ff8a2b', maxSpeed: 168, accel: 112, grip: 1.00, shirt: 0xff6a00, spd: 0.90, acc: 0.96, hnd: 0.80 },
+    { name: 'Punam',   car: 'Red Bull',      em: '👩🏼',    color: 0x14235e, tint: '#6f86ff', maxSpeed: 176, accel: 110, grip: 1.08, shirt: 0x2a3a8c, spd: 0.96, acc: 0.94, hnd: 0.88 },
+    { name: 'Pritika', car: 'Porsche',       em: '👩🏽‍🦱', color: 0xcdd2d6, tint: '#d8dce0', maxSpeed: 164, accel: 104, grip: 1.14, shirt: 0xcdd2d6, spd: 0.86, acc: 0.88, hnd: 0.94 },
+    { name: 'Shreya',  car: 'Aston Martin',  em: '👩🏻',    color: 0x016b5b, tint: '#31c9a5', maxSpeed: 160, accel: 102, grip: 1.06, shirt: 0x016b5b, spd: 0.82, acc: 0.86, hnd: 0.88 },
+    { name: 'Sandeep', car: 'Audi',          em: '🧑🏽‍🦱', color: 0x565b62, tint: '#aab0b8', maxSpeed: 158, accel: 106, grip: 1.12, shirt: 0x565b62, spd: 0.80, acc: 0.90, hnd: 0.92 }
   ];
   let selected = 0;
 
@@ -670,7 +676,7 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
     const el = document.createElement('div');
     el.className = 'dcard' + (i === 0 ? ' sel' : '');
     el.innerHTML = '<div class="em">' + d.em + '</div><div class="dn">' + d.name + '</div>' +
-      '<div class="dc ' + d.cls + '">' + d.car + '</div>' +
+      '<div class="dc" style="color:' + d.tint + '">' + d.car + '</div>' +
       '<div class="bars">' + bar('SPD', d.spd) + bar('ACC', d.acc) + bar('HND', d.hnd) + '</div>';
     el.onclick = () => { driversEl.querySelectorAll('.dcard').forEach(c => c.classList.remove('sel')); el.classList.add('sel'); setPlayerCar(i); };
     driversEl.appendChild(el);
