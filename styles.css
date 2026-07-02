@@ -277,9 +277,13 @@ html.dark .icon-moon{ display: none; }
 .hero-blob.b1{ width: 480px; height: 480px; top: -160px; right: -120px; background: var(--accent-soft); }
 .hero-blob.b2{ width: 380px; height: 380px; bottom: -140px; left: -140px; background: var(--secondary-soft); opacity: .2; }
 
+/* Site-wide 3D particle background: fixed to the viewport and pinned behind
+   all content (z-index:-1 paints above the body base color but under normal
+   flow content), so the nebula stays visible through every section as you
+   scroll the whole page. */
 #hero-3d-canvas{
-  position: absolute; inset: 0; z-index: 0;
-  width: 100%; height: 100%;
+  position: fixed; inset: 0; z-index: -1;
+  width: 100vw; height: 100vh;
   pointer-events: none;
 }
 

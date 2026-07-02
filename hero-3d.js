@@ -200,9 +200,10 @@ import * as THREE from 'https://unpkg.com/three@0.160.1/build/three.module.js';
   var targetPanX = 0, targetPanY = 0;
 
   function onPointerMove(e){
-    var rect = hero.getBoundingClientRect();
-    pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-    pointer.y = ((e.clientY - rect.top) / rect.height) * 2 - 1;
+    // Canvas is now a fixed full-viewport layer, so normalize against the
+    // window rather than the hero box.
+    pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
+    pointer.y = (e.clientY / window.innerHeight) * 2 - 1;
     // subtle whole-field parallax + tilt toward the cursor
     targetRotY = pointer.x * 0.12;
     targetRotX = pointer.y * 0.08;
@@ -212,20 +213,15 @@ import * as THREE from 'https://unpkg.com/three@0.160.1/build/three.module.js';
   window.addEventListener('mousemove', onPointerMove, { passive: true });
 
   function resize(){
-    var rect = hero.getBoundingClientRect();
-    var width = Math.max(rect.width, 1);
-    var height = Math.max(rect.height, 1);
+    var width = Math.max(window.innerWidth, 1);
+    var height = Math.max(window.innerHeight, 1);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxPixelRatio));
     renderer.setSize(width, height, false);
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
   }
   resize();
-  if ('ResizeObserver' in window) {
-    new ResizeObserver(resize).observe(hero);
-  } else {
-    window.addEventListener('resize', resize, { passive: true });
-  }
+  window.addEventListener('resize', resize, { passive: true });
 
   var running = false;
   var clock = new THREE.Clock();
@@ -283,16 +279,9 @@ import * as THREE from 'https://unpkg.com/three@0.160.1/build/three.module.js';
     running = false;
   }
 
-  if ('IntersectionObserver' in window) {
-    var io = new IntersectionObserver(function(entries){
-      entries.forEach(function(entry){
-        if (entry.isIntersecting) start(); else stop();
-      });
-    }, { threshold: 0.05 });
-    io.observe(hero);
-  } else {
-    start();
-  }
+  // The canvas backs the whole page now, so run continuously — only pause
+  // when the tab is hidden to save the battery.
+  start();
 
   document.addEventListener('visibilitychange', function(){
     if (document.hidden) stop(); else if (!reduceMotion) start();
