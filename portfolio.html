@@ -12,7 +12,7 @@
 <link rel="icon" href="assets/logo.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,600;1,9..144,900&family=Hanken+Grotesk:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#05060f;
@@ -29,7 +29,8 @@
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
   body{
-    font-family:'Inter',system-ui,sans-serif;
+    font-family:'Hanken Grotesk',system-ui,sans-serif;
+    font-optical-sizing:auto;
     color:var(--text);
     background:
       radial-gradient(120% 80% at 82% -10%, rgba(124,58,237,.22), transparent 55%),
@@ -42,7 +43,7 @@
   }
   a{color:inherit;text-decoration:none}
   img{display:block;max-width:100%}
-  em{font-style:normal;background:linear-gradient(90deg,var(--cyan),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
+  em{font-family:'Fraunces',serif;font-style:italic;font-weight:500;background:linear-gradient(90deg,var(--cyan),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
   .eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--cyan);margin-bottom:22px}
 
   /* ===== COSMOS LAYERS ===== */
@@ -81,9 +82,9 @@
   .hero-headline{
     position:relative;z-index:3;pointer-events:none;
     display:flex;flex-direction:column;align-items:center;
-    font-family:'Syne',sans-serif;font-weight:800;
-    letter-spacing:-.01em;line-height:.78;text-align:center;
-    font-size:clamp(34px,7.6vw,116px);color:#eef0ff;
+    font-family:'Fraunces',serif;font-weight:900;font-optical-sizing:auto;
+    letter-spacing:-.015em;line-height:.82;text-align:center;
+    font-size:clamp(36px,8vw,120px);color:#eef0ff;
     transform:perspective(760px) rotateX(16deg);transform-origin:center bottom;
     text-shadow:
       0 1px 0 #b9b6e6,0 2px 0 #a29ede,0 3px 0 #8b86d2,
@@ -92,7 +93,7 @@
     margin-bottom:-.04em;animation:float3d 6s ease-in-out infinite;
   }
   .hero-headline span{display:block}
-  .hero-headline .amp{font-size:.66em;line-height:.66;color:#cdc8ff;margin:.02em 0;
+  .hero-headline .amp{font-style:italic;font-weight:400;font-size:.72em;line-height:.66;color:#cdc8ff;margin:.02em 0;
     text-shadow:0 1px 0 #8b86d2,0 2px 0 #6f6ac4,0 3px 0 #574fb0,0 5px 12px rgba(0,0,0,.5),0 14px 32px rgba(168,85,247,.55)}
   @keyframes float3d{0%,100%{transform:perspective(760px) rotateX(16deg) translateY(0)}50%{transform:perspective(760px) rotateX(13deg) translateY(-10px)}}
   .hero-portrait{position:relative;width:min(42vw,392px);aspect-ratio:3/4;border-radius:26px 26px 0 0;overflow:hidden;z-index:1;
@@ -105,13 +106,14 @@
 
   /* ===== INTRO ===== */
   .intro{padding:clamp(60px,9vw,110px) var(--pad) 0;max-width:1400px;margin:0 auto}
-  .intro-lead{font-family:'DM Sans',sans-serif;font-weight:500;font-size:clamp(24px,3.4vw,40px);line-height:1.28;max-width:1100px}
-  .intro-lead b{font-weight:500;background:linear-gradient(90deg,var(--cyan),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .intro-lead{font-family:'Fraunces',serif;font-weight:400;font-size:clamp(25px,3.6vw,44px);line-height:1.34;max-width:1100px;letter-spacing:-.01em}
+  .intro-lead .soft{font-style:italic;font-weight:500;color:#f3f0ff}
+  .intro-lead b{font-style:italic;font-weight:600;background:linear-gradient(90deg,var(--cyan),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
 
   /* ===== ABOUT + GALLERY ===== */
   .about{padding:clamp(60px,9vw,110px) var(--pad)}
   .about-grid{display:grid;grid-template-columns:1fr 1.05fr;gap:clamp(30px,5vw,70px);align-items:center;max-width:1400px;margin:0 auto}
-  .about-copy h2{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(30px,4.4vw,58px);line-height:1.05;letter-spacing:-.02em;margin-bottom:22px}
+  .about-copy h2{font-family:'Fraunces',serif;font-weight:800;font-size:clamp(30px,4.4vw,58px);line-height:1.05;letter-spacing:-.02em;margin-bottom:22px}
   .about-copy p{color:var(--muted);font-size:clamp(15px,1.5vw,18px);line-height:1.7;max-width:520px}
   .about-tags{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
   .about-tags span{font-family:'IBM Plex Mono',monospace;font-size:13px;color:#c7ccf0;background:var(--glass);border:1px solid var(--glass-brd);border-radius:999px;padding:8px 14px}
@@ -128,14 +130,14 @@
   /* ===== WORKS ===== */
   .works{padding:clamp(60px,9vw,110px) var(--pad) clamp(50px,7vw,80px);max-width:1500px;margin:0 auto}
   .works-head{display:flex;justify-content:space-between;align-items:flex-end;gap:40px;flex-wrap:wrap;margin-bottom:clamp(36px,5vw,60px)}
-  .works-head h2{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(38px,7vw,92px);letter-spacing:-.02em;line-height:1}
-  .works-head p{font-family:'DM Sans',sans-serif;font-weight:300;font-size:clamp(13px,1.3vw,18px);max-width:420px;text-transform:uppercase;letter-spacing:.04em;line-height:1.6;color:var(--muted)}
+  .works-head h2{font-family:'Fraunces',serif;font-weight:800;font-size:clamp(38px,7vw,92px);letter-spacing:-.02em;line-height:1}
+  .works-head p{font-family:'Hanken Grotesk',sans-serif;font-weight:300;font-size:clamp(13px,1.3vw,18px);max-width:420px;text-transform:uppercase;letter-spacing:.04em;line-height:1.6;color:var(--muted)}
   .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:clamp(22px,3vw,34px)}
   .card{display:flex;flex-direction:column;gap:20px}
   .card .thumb{aspect-ratio:807/470;border-radius:24px;overflow:hidden;position:relative;display:grid;place-items:center;transition:.4s;
     box-shadow:0 20px 50px rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.08)}
   .card:hover .thumb{transform:translateY(-6px);box-shadow:0 26px 70px rgba(0,0,0,.5),0 0 50px rgba(99,102,241,.4)}
-  .card .thumb .label{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(28px,4.2vw,58px);color:#fff;letter-spacing:-.01em;text-shadow:0 4px 30px rgba(0,0,0,.5);z-index:2}
+  .card .thumb .label{font-family:'Fraunces',serif;font-weight:800;font-size:clamp(28px,4.2vw,58px);color:#fff;letter-spacing:-.01em;text-shadow:0 4px 30px rgba(0,0,0,.5);z-index:2}
   .card .thumb .badge{position:absolute;top:18px;left:20px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:rgba(255,255,255,.9);z-index:2;letter-spacing:.03em}
   .t-drive{background:linear-gradient(135deg,#0b1024,#123a6b 45%,#e8b04b)}
   .t-nebula{background:radial-gradient(120% 120% at 30% 20%,#3b1d6e,#0a0a1a 70%)}
@@ -153,20 +155,20 @@
 
   /* ===== SKILLS ===== */
   .skills{padding:clamp(60px,8vw,100px) var(--pad);max-width:1500px;margin:0 auto}
-  .skills h2{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(34px,6vw,76px);letter-spacing:-.02em;line-height:1.05;max-width:16ch;margin:0 auto clamp(40px,6vw,70px);text-align:center}
+  .skills h2{font-family:'Fraunces',serif;font-weight:800;font-size:clamp(34px,6vw,76px);letter-spacing:-.02em;line-height:1.05;max-width:16ch;margin:0 auto clamp(40px,6vw,70px);text-align:center}
   .skills-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
   .skill-card{background:var(--glass);border:1px solid var(--glass-brd);border-radius:22px;padding:32px 28px;transition:.3s;backdrop-filter:blur(12px)}
   .skill-card:hover{transform:translateY(-5px);border-color:rgba(129,140,248,.5);box-shadow:0 20px 50px rgba(0,0,0,.4),0 0 40px rgba(99,102,241,.25)}
   .skill-card .chips{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:24px}
   .skill-card .chips span{background:rgba(129,140,248,.12);border:1px solid rgba(129,140,248,.25);border-radius:11px;padding:8px 13px;font-size:13px;color:#d7dbff}
-  .skill-card h4{font-family:'Syne',sans-serif;font-size:21px;font-weight:700;margin-bottom:11px}
-  .skill-card p{font-family:'DM Sans',sans-serif;font-weight:300;color:var(--muted);font-size:15px;line-height:1.6}
+  .skill-card h4{font-family:'Fraunces',serif;font-size:21px;font-weight:700;margin-bottom:11px}
+  .skill-card p{font-family:'Hanken Grotesk',sans-serif;font-weight:300;color:var(--muted);font-size:15px;line-height:1.6}
 
   /* ===== CONTACT ===== */
   .contact{padding:clamp(56px,7vw,80px) var(--pad)}
   .contact-inner{max-width:1400px;margin:0 auto;background:var(--glass);border:1px solid var(--glass-brd);border-radius:32px;padding:clamp(32px,5vw,64px);backdrop-filter:blur(14px);position:relative;overflow:hidden}
   .contact .kicker{font-family:'IBM Plex Mono',monospace;font-size:15px;color:var(--cyan)}
-  .contact h2{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(40px,7vw,80px);line-height:1.04;margin:14px 0 40px;letter-spacing:-.02em}
+  .contact h2{font-family:'Fraunces',serif;font-weight:800;font-size:clamp(40px,7vw,80px);line-height:1.04;margin:14px 0 40px;letter-spacing:-.02em}
   .contact .rule{height:1px;background:rgba(255,255,255,.12);width:100%}
   .contact-row{display:flex;flex-wrap:wrap;gap:28px 57px;align-items:center;justify-content:space-between;margin-top:44px}
   .contact-info{display:flex;flex-wrap:wrap;gap:34px 57px}
@@ -175,18 +177,18 @@
   .contact-info a:hover{color:var(--cyan)}
   .get-in-touch{width:clamp(150px,20vw,206px);aspect-ratio:1;border-radius:50%;flex:none;
     background:linear-gradient(140deg,var(--accent),var(--violet) 55%,var(--pink));color:#fff;
-    display:grid;place-items:center;text-align:center;font-family:'Syne',sans-serif;font-weight:700;font-size:clamp(16px,2vw,22px);
+    display:grid;place-items:center;text-align:center;font-family:'Fraunces',serif;font-weight:700;font-size:clamp(16px,2vw,22px);
     transition:.3s;box-shadow:0 20px 60px rgba(124,58,237,.5)}
   .get-in-touch:hover{transform:scale(1.05) rotate(-4deg);box-shadow:0 24px 70px rgba(236,72,153,.5)}
 
   /* ===== FOOTER ===== */
   .footer{padding:clamp(40px,5vw,60px) var(--pad) clamp(30px,4vw,50px);overflow:hidden}
   .footer-top{display:flex;justify-content:space-between;align-items:center;gap:24px}
-  .footer-top p{font-family:'DM Sans',sans-serif;font-weight:300;font-size:clamp(26px,5.5vw,84px);line-height:1;color:#dfe1ff}
+  .footer-top p{font-family:'Hanken Grotesk',sans-serif;font-weight:300;font-size:clamp(26px,5.5vw,84px);line-height:1;color:#dfe1ff}
   .footer-top .up{width:clamp(64px,10vw,128px);aspect-ratio:1;border-radius:50%;border:1.5px solid rgba(255,255,255,.4);display:grid;place-items:center;flex:none;transition:.3s}
   .footer-top .up:hover{background:var(--accent);border-color:var(--accent);box-shadow:0 0 30px rgba(99,102,241,.6)}
   .footer-top .up svg{width:40%;height:40%}
-  .footer-name{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(90px,26vw,300px);line-height:.82;letter-spacing:.01em;margin-top:.08em;white-space:nowrap;
+  .footer-name{font-family:'Fraunces',serif;font-weight:800;font-size:clamp(90px,26vw,300px);line-height:.82;letter-spacing:.01em;margin-top:.08em;white-space:nowrap;
     background:linear-gradient(100deg,#818cf8,#a855f7 40%,#38bdf8 75%,#ec4899);-webkit-background-clip:text;background-clip:text;color:transparent}
   .footer-legal{margin-top:34px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:#6a6f97}
 
@@ -252,7 +254,7 @@
 
 <!-- ===== INTRO ===== -->
 <section class="intro">
-  <p class="intro-lead">Driven by curiosity and a love for design, I create <b>simple, functional, and visually striking</b> digital experiences. As a student, I’m always learning and exploring new ideas at the intersection of creativity and technology.</p>
+  <p class="intro-lead">Driven by curiosity and <span class="soft">a love for design</span>, I create <b>simple, functional, and visually striking</b> digital experiences. As a student, I’m always learning — and quietly falling for the little details that make things feel human.</p>
 </section>
 
 <!-- ===== ABOUT + GALLERY ===== -->
