@@ -32,12 +32,7 @@
     font-family:'Hanken Grotesk',system-ui,sans-serif;
     font-optical-sizing:auto;
     color:var(--text);
-    background:
-      radial-gradient(120% 80% at 82% -10%, rgba(124,58,237,.22), transparent 55%),
-      radial-gradient(120% 80% at -5% 108%, rgba(56,189,248,.16), transparent 55%),
-      radial-gradient(90% 60% at 50% 50%, rgba(236,72,153,.05), transparent 60%),
-      var(--bg);
-    background-attachment:fixed;
+    background:var(--bg);
     -webkit-font-smoothing:antialiased;
     overflow-x:hidden;
   }
@@ -46,29 +41,22 @@
   em{font-family:'Fraunces',serif;font-style:italic;font-weight:500;background:linear-gradient(90deg,var(--cyan),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
   .eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--cyan);margin-bottom:22px}
 
-  /* ===== COSMOS LAYERS ===== */
-  #space{position:fixed;inset:0;z-index:0;pointer-events:none}
-  .floaties{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden}
-  .orb,.planet,.shape{position:absolute;will-change:transform}
-  .orb{border-radius:50%;filter:blur(2px);opacity:.85}
-  .o1{width:160px;height:160px;left:6%;top:16%;background:radial-gradient(circle at 32% 30%,#a5b4fc,#4f46e5 55%,#312e81);box-shadow:0 0 80px rgba(99,102,241,.55);animation:drift1 26s ease-in-out infinite}
-  .o2{width:90px;height:90px;right:10%;top:26%;background:radial-gradient(circle at 35% 30%,#7dd3fc,#0ea5e9 60%,#075985);box-shadow:0 0 60px rgba(56,189,248,.5);animation:drift2 22s ease-in-out infinite}
-  .o3{width:60px;height:60px;left:14%;bottom:12%;background:radial-gradient(circle at 35% 30%,#f9a8d4,#db2777 60%,#831843);box-shadow:0 0 50px rgba(236,72,153,.5);animation:drift3 30s ease-in-out infinite}
-  .o4{width:36px;height:36px;right:22%;bottom:20%;background:radial-gradient(circle at 35% 30%,#fde68a,#f59e0b 60%,#92400e);box-shadow:0 0 40px rgba(245,158,11,.45);animation:drift2 18s ease-in-out infinite}
-  .planet{width:200px;height:200px;right:-40px;top:8%;border-radius:50%;
-    background:radial-gradient(circle at 30% 28%,#c4b5fd,#7c3aed 55%,#3b0764);
-    box-shadow:0 0 90px rgba(124,58,237,.5),inset -20px -20px 60px rgba(0,0,0,.5);
-    animation:drift1 34s ease-in-out infinite}
-  .planet::after{content:"";position:absolute;inset:-38% -14%;border-radius:50%;
-    border:14px solid rgba(186,169,255,.28);transform:rotate(28deg) scaleY(.34);
-    box-shadow:0 0 24px rgba(168,85,247,.35)}
-  .shape{width:44px;height:44px;left:48%;top:12%;border:2px solid rgba(129,140,248,.55);
-    transform:rotate(45deg);box-shadow:0 0 30px rgba(99,102,241,.35);animation:spin 24s linear infinite}
-  .shape.s2{left:30%;bottom:26%;width:26px;height:26px;border-color:rgba(56,189,248,.6);animation-duration:16s}
-  @keyframes drift1{0%,100%{transform:translate(0,0)}50%{transform:translate(28px,-34px)}}
-  @keyframes drift2{0%,100%{transform:translate(0,0)}50%{transform:translate(-30px,26px)}}
-  @keyframes drift3{0%,100%{transform:translate(0,0)}50%{transform:translate(22px,30px)}}
-  @keyframes spin{to{transform:rotate(405deg)}}
+  /* ===== 3D MOVING PHOTO BACKGROUND ===== */
+  .bg3d{position:fixed;inset:-7vmax;z-index:0;overflow:hidden;pointer-events:none;transform-style:preserve-3d;will-change:transform}
+  .bg-layer{position:absolute;inset:0;background-size:cover;background-position:center;will-change:transform,opacity;backface-visibility:hidden}
+  .bg-layer.l1{background-image:url("assets/bg-mountain.jpg");animation:kb1 34s ease-in-out infinite,xfade1 34s ease-in-out infinite}
+  .bg-layer.l2{background-image:url("assets/bg-stupa.jpg");opacity:0;animation:kb2 34s ease-in-out infinite,xfade2 34s ease-in-out infinite}
+  .bg-scrim{position:absolute;inset:0;background:
+    linear-gradient(180deg,rgba(5,6,15,.80),rgba(5,6,15,.60) 42%,rgba(5,6,15,.88)),
+    radial-gradient(120% 85% at 50% -5%,rgba(99,102,241,.30),transparent 60%),
+    radial-gradient(120% 85% at 50% 105%,rgba(56,189,248,.15),transparent 60%)}
+  .bg-grain{position:absolute;inset:0;opacity:.45;
+    background-image:radial-gradient(rgba(255,255,255,.05) 1px,transparent 1px);background-size:24px 24px;
+    -webkit-mask-image:radial-gradient(120% 80% at 50% 40%,#000 40%,transparent 88%);mask-image:radial-gradient(120% 80% at 50% 40%,#000 40%,transparent 88%)}
+  @keyframes kb1{0%,100%{transform:scale(1.12) translate(0,0)}50%{transform:scale(1.26) translate(-2.5%,-2%)}}
+  @keyframes kb2{0%,100%{transform:scale(1.10) translate(1.5%,1%)}50%{transform:scale(1.24) translate(-1.5%,-1%)}}
+  @keyframes xfade1{0%,42%{opacity:1}50%,92%{opacity:0}100%{opacity:1}}
+  @keyframes xfade2{0%,42%{opacity:0}50%,92%{opacity:1}100%{opacity:0}}
 
   main,footer,.dock{position:relative;z-index:2}
 
@@ -215,21 +203,17 @@
     .contact-row{flex-direction:column-reverse;align-items:flex-start}
   }
   @media (prefers-reduced-motion:reduce){
-    .hero-headline,.orb,.planet,.shape{animation:none}
+    .hero-headline,.bg-layer{animation:none}
   }
 </style>
 </head>
 <body>
 
-<canvas id="space"></canvas>
-<div class="floaties" aria-hidden="true">
-  <div class="planet"></div>
-  <div class="orb o1"></div>
-  <div class="orb o2"></div>
-  <div class="orb o3"></div>
-  <div class="orb o4"></div>
-  <div class="shape s1"></div>
-  <div class="shape s2"></div>
+<div class="bg3d" id="bg3d" aria-hidden="true">
+  <div class="bg-layer l1"></div>
+  <div class="bg-layer l2"></div>
+  <div class="bg-scrim"></div>
+  <div class="bg-grain"></div>
 </div>
 
 <main>
@@ -399,103 +383,21 @@
   var yrEl = document.getElementById('yr');
   if (yrEl) yrEl.textContent = new Date().getFullYear();
 
-  /* ===== UNIVERSE PARTICLE SIMULATION ===== */
+  /* ===== 3D PARALLAX PHOTO BACKGROUND ===== */
   (function(){
-    const cv = document.getElementById('space');
-    if (!cv || !cv.getContext) return;
-    const ctx = cv.getContext('2d');
-    if (!ctx) return;
-    const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
-    let W,H,DPR, stars=[], parts=[], shooters=[];
-    let mx=0,my=0,tmx=0,tmy=0;
-    const rand=(a,b)=>a+Math.random()*(b-a);
-
-    function init(){
-      const area = innerWidth*innerHeight;
-      const nStars = Math.min(300, Math.floor(area/5500));
-      stars = Array.from({length:nStars},()=>({
-        x:Math.random()*W, y:Math.random()*H, r:rand(.4,1.7)*DPR,
-        tw:rand(0,Math.PI*2), sp:rand(.5,2), z:rand(.2,1)
-      }));
-      const nP = Math.min(95, Math.floor(area/17000));
-      parts = Array.from({length:nP},()=>({
-        x:Math.random()*W, y:Math.random()*H,
-        vx:rand(-.14,.14)*DPR, vy:rand(-.14,.14)*DPR,
-        r:rand(1,2.3)*DPR, z:rand(.3,1)
-      }));
-    }
-    function resize(){
-      DPR = Math.min(devicePixelRatio||1, 2);
-      W = cv.width = innerWidth*DPR;
-      H = cv.height = innerHeight*DPR;
-      cv.style.width = innerWidth+'px';
-      cv.style.height = innerHeight+'px';
-      init();
-    }
-
-    function draw(){
-      ctx.clearRect(0,0,W,H);
-      mx += (tmx-mx)*.05; my += (tmy-my)*.05;
-
-      // twinkling starfield
-      for(const s of stars){
-        if(!reduce) s.tw += 0.02*s.sp;
-        const a = .35 + .5*Math.abs(Math.sin(s.tw));
-        const px = s.x + mx*20*s.z, py = s.y + my*20*s.z;
-        ctx.globalAlpha = a;
-        ctx.fillStyle = s.z>.75 ? '#eef1ff' : '#c7ccf5';
-        ctx.beginPath(); ctx.arc(px,py,s.r,0,6.2832); ctx.fill();
-      }
-      ctx.globalAlpha = 1;
-
-      // constellation particles + links
-      if(!reduce){
-        for(const p of parts){
-          p.x+=p.vx; p.y+=p.vy;
-          if(p.x<0)p.x+=W; else if(p.x>W)p.x-=W;
-          if(p.y<0)p.y+=H; else if(p.y>H)p.y-=H;
-        }
-      }
-      const maxD = 150*DPR, maxD2 = maxD*maxD;
-      for(let i=0;i<parts.length;i++){
-        const a=parts[i], ax=a.x+mx*46*a.z, ay=a.y+my*46*a.z;
-        for(let j=i+1;j<parts.length;j++){
-          const b=parts[j], bx=b.x+mx*46*b.z, by=b.y+my*46*b.z;
-          const dx=ax-bx, dy=ay-by, d2=dx*dx+dy*dy;
-          if(d2<maxD2){
-            const al=(1-Math.sqrt(d2)/maxD)*.45;
-            ctx.strokeStyle='rgba(129,140,248,'+al+')';
-            ctx.lineWidth=DPR;
-            ctx.beginPath(); ctx.moveTo(ax,ay); ctx.lineTo(bx,by); ctx.stroke();
-          }
-        }
-        ctx.fillStyle='rgba(199,210,254,.9)';
-        ctx.beginPath(); ctx.arc(ax,ay,a.r,0,6.2832); ctx.fill();
-      }
-
-      // shooting stars
-      if(!reduce){
-        if(Math.random()<0.006 && shooters.length<3){
-          shooters.push({x:rand(0,W*.5), y:rand(0,H*.45), len:rand(120,280)*DPR, sp:rand(6,11)*DPR, life:1});
-        }
-        for(let i=shooters.length-1;i>=0;i--){
-          const sh=shooters[i];
-          sh.x+=sh.sp; sh.y+=sh.sp*.42; sh.life-=0.012;
-          if(sh.life<=0||sh.x>W){ shooters.splice(i,1); continue; }
-          const g=ctx.createLinearGradient(sh.x,sh.y,sh.x-sh.len,sh.y-sh.len*.42);
-          g.addColorStop(0,'rgba(255,255,255,'+sh.life+')');
-          g.addColorStop(1,'rgba(255,255,255,0)');
-          ctx.strokeStyle=g; ctx.lineWidth=2*DPR;
-          ctx.beginPath(); ctx.moveTo(sh.x,sh.y); ctx.lineTo(sh.x-sh.len,sh.y-sh.len*.42); ctx.stroke();
-        }
-        requestAnimationFrame(draw);
-      }
-    }
-
-    addEventListener('resize', resize, {passive:true});
-    addEventListener('mousemove', e=>{ tmx=e.clientX/innerWidth-.5; tmy=e.clientY/innerHeight-.5; }, {passive:true});
-    resize();
-    draw();
+    const bg = document.getElementById('bg3d');
+    if (!bg) return;
+    if (matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+    let tx=0, ty=0, cx=0, cy=0, sy=0;
+    addEventListener('mousemove', e=>{ tx=e.clientX/innerWidth-.5; ty=e.clientY/innerHeight-.5; }, {passive:true});
+    addEventListener('scroll', ()=>{ sy=Math.min(scrollY,1600); }, {passive:true});
+    (function loop(){
+      cx += (tx-cx)*.06; cy += (ty-cy)*.06;
+      bg.style.transform =
+        'perspective(1200px) translate3d('+(cx*-26).toFixed(2)+'px,'+((cy*-26)-(sy*0.05)).toFixed(2)+'px,0)'+
+        ' rotateX('+(cy*2.2).toFixed(2)+'deg) rotateY('+(cx*-2.6).toFixed(2)+'deg)';
+      requestAnimationFrame(loop);
+    })();
   })();
 
   /* ===== dock active state ===== */
