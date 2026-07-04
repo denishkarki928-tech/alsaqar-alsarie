@@ -1,0 +1,63 @@
+name: Validate site
+
+# Runs on every push and PR to main. This does NOT deploy the site —
+# GitHub Pages still deploys from main on its own. This just catches
+# broken HTML and dead internal links before you notice them live.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  html:
+    name: Validate HTML
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # W3C Nu validator. Blocking: if the HTML is malformed, this fails.
+      - name: Validate HTML5
+        uses: Cyb3r-Jak3/html5validator-action@v7.2.0
+        with:
+          root: .
+          # Only check the real pages; skip vendored/minified assets.
+          blacklist: assets node_modules .git
+          css: false
+
+  links:
+    name: Check links
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Internal links / asset paths: broken relative paths fail the build.
+      # External links (Unsplash, wa.me) rate-limit and block bots, so they
+      # are excluded here to avoid false failures — see the "external" job.
+      - name: Check internal links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --offline
+            --include-fragments
+            --no-progress
+            './*.html'
+          fail: true
+
+      # External links: informational only. A dead external link shows up in
+      # the job summary but never blocks — network flakiness shouldn't fail CI.
+      - name: Check external links (informational)
+        uses: lycheeverse/lychee-action@v2
+        continue-on-error: true
+        with:
+          args: >-
+            --no-progress
+            --max-retries 2
+            --accept 200,206,301,302,307,308,403,429
+            --exclude 'wa\.me'
+            './*.html'
+          fail: false
