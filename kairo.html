@@ -3,8 +3,18 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'" />
 <meta name="referrer" content="strict-origin-when-cross-origin" />
+<script>
+/* clickjacking guard: frame-ancestors in a meta CSP is ignored by browsers,
+   so break out of any framing attempt here */
+if (self !== top) { try { top.location.replace(self.location.href); } catch (e) { document.documentElement.style.display = 'none'; } }
+</script>
+<noscript><style>
+  .reveal,.hero__title .line>span{opacity:1!important;transform:none!important}
+  .loader,.cursor,.cursor-dot{display:none!important}
+  body{cursor:auto!important}
+</style></noscript>
 <title>KAIRO — Conquering Style</title>
 <meta name="description" content="KAIRO — premium streetwear from Bhadrapur, Jhapa. Conquer the style. Delivery all over Nepal." />
 
@@ -276,7 +286,7 @@
         <h2 class="reveal">On The Streets</h2>
       </div>
     </div>
-    <div class="look__track" id="look">
+    <div class="look__track" id="lookTrack">
       <div class="look__item" data-hover><div class="card__ph"><b>Look 01</b></div><p>Bhadrapur</p></div>
       <div class="look__item" data-hover><div class="card__ph"><b>Look 02</b></div><p>Summer '25</p></div>
       <div class="look__item" data-hover><div class="card__ph"><b>Look 03</b></div><p>Conquer</p></div>
@@ -325,13 +335,24 @@
     <div class="copy">© <span id="year"></span> KAIRO Clothing — Conquering Style — Bhadrapur, Jhapa, Nepal</div>
   </footer>
 
-  <!-- Libraries: GSAP + ScrollTrigger + Lenis (humanized motion stack) -->
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+  <!-- Libraries: GSAP + ScrollTrigger + Lenis (self-hosted — no third-party script execution) -->
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script src="assets/vendor/ScrollTrigger.min.js"></script>
+  <script src="assets/vendor/lenis.min.js"></script>
   <script>
   document.getElementById('year').textContent = new Date().getFullYear();
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /* HAS: animation libs loaded; if they ever fail, reveal everything —
+     the page must never be blank or broken. */
+  const HAS = !!(window.gsap && window.ScrollTrigger && window.Lenis);
+  const MOTION = HAS && !reduce;
+  if (!HAS) {
+    const s = document.createElement('style');
+    s.textContent = '.reveal,.hero__title .line>span{opacity:1!important;transform:none!important}' +
+      '.loader{display:none!important}.manifesto .w{opacity:1!important}';
+    document.head.appendChild(s);
+    document.querySelectorAll('[data-count]').forEach(el => { el.textContent = el.dataset.count; });
+  }
 
   /* ---------- Custom cursor ---------- */
   (function(){
@@ -383,6 +404,7 @@
   }
 
   window.addEventListener('load',()=>{
+    if(!HAS){document.getElementById('loader').style.display='none';return;}
     if(reduce){document.getElementById('loader').style.display='none';
       gsap.set('.hero__title .line>span',{y:0});gsap.set('.reveal',{opacity:1,y:0});initScroll();return;}
     runIntro(); initScroll();
@@ -437,7 +459,7 @@
         marqueeReset=setTimeout(()=>gsap.to(marqueeTween,{timeScale:1,duration:.6,overwrite:true}),120);}});
 
     /* lookbook horizontal drag on scroll */
-    const look=document.getElementById('look');
+    const look=document.getElementById('lookTrack');
     if(look && look.scrollWidth>look.clientWidth){
       const dist=look.scrollWidth-look.clientWidth+40;
       gsap.to(look,{x:-dist,ease:'none',
