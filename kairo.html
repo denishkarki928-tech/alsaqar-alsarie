@@ -357,13 +357,23 @@
     const word='KAIRO', box=document.getElementById('loaderWord');
     [...word].forEach(ch=>{const w=document.createElement('span');w.textContent=ch;box.appendChild(w);});
     const letters=box.querySelectorAll('span');
-    const tl=gsap.timeline();
+    let introDone=false;
+    const tl=gsap.timeline({onComplete:()=>introDone=true});
     tl.to(letters,{y:0,duration:.7,ease:'power4.out',stagger:.06})
       .to('#loaderBar',{width:'100%',duration:.9,ease:'power2.inOut'},'-=.3')
       .to(letters,{y:'-110%',duration:.6,ease:'power4.in',stagger:.03},'+=.15')
       .to('#loader',{yPercent:-100,duration:.8,ease:'power4.inOut'},'-=.2')
       .set('#loader',{display:'none'})
       .add(heroIn,'-=.4');
+    /* safety: if rAF is suspended (background tab) the timeline never plays —
+       force final state via timer so the loader can never trap the page */
+    setTimeout(()=>{
+      if(introDone)return;
+      tl.kill();
+      document.getElementById('loader').style.display='none';
+      gsap.set('.hero__title .line>span',{y:0});
+      gsap.set('.hero .reveal',{opacity:1,y:0});
+    },4500);
   }
 
   /* ---------- Hero entrance ---------- */
@@ -418,10 +428,13 @@
 
     /* marquee scroll-direction reactive */
     const track=document.getElementById('marquee');
-    let mx=0;
-    gsap.to(track,{xPercent:-50,repeat:-1,duration:18,ease:'none'});
+    const marqueeTween=gsap.to(track,{xPercent:-50,repeat:-1,duration:18,ease:'none'});
+    let marqueeReset;
     ScrollTrigger.create({trigger:document.body,start:'top top',end:'bottom bottom',
-      onUpdate:self=>{const v=self.getVelocity();gsap.to(track,{timeScale:1+Math.min(Math.abs(v)/300,3),overwrite:true});setTimeout(()=>gsap.to(track,{timeScale:1,overwrite:true}),120);}});
+      onUpdate:self=>{const v=self.getVelocity();
+        gsap.to(marqueeTween,{timeScale:1+Math.min(Math.abs(v)/300,3),duration:.2,overwrite:true});
+        clearTimeout(marqueeReset);
+        marqueeReset=setTimeout(()=>gsap.to(marqueeTween,{timeScale:1,duration:.6,overwrite:true}),120);}});
 
     /* lookbook horizontal drag on scroll */
     const look=document.getElementById('look');
