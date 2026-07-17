@@ -45,8 +45,17 @@
     var q = item.querySelector('.faq-q');
     q.addEventListener('click', function(){
       var wasOpen = item.classList.contains('open');
-      document.querySelectorAll('.faq-item.open').forEach(function(el){ el.classList.remove('open'); });
-      if (!wasOpen) item.classList.add('open');
+      document.querySelectorAll('.faq-item.open').forEach(function(el){
+        el.classList.remove('open');
+        var b = el.querySelector('.faq-q');
+        if (b) b.setAttribute('aria-expanded', 'false');
+      });
+      if (!wasOpen) {
+        item.classList.add('open');
+        q.setAttribute('aria-expanded', 'true');
+      } else {
+        q.setAttribute('aria-expanded', 'false');
+      }
     });
   });
 

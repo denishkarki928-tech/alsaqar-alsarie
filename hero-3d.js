@@ -1,4 +1,4 @@
-import * as THREE from 'https://unpkg.com/three@0.160.1/build/three.module.js';
+import * as THREE from './assets/vendor/three.module.min.js';
 
 (function(){
   var hero = document.querySelector('.hero');
