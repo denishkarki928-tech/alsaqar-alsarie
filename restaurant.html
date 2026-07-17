@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Aurum Restaurant | Fine Dining Experience</title>
+  <meta name="description" content="A premium fine dining restaurant website template with menu, reservations, gallery, and contact sections." />
+
+  <meta property="og:title" content="Aurum Restaurant" />
+  <meta property="og:description" content="Modern fine dining. Seasonal ingredients. Elegant atmosphere." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1600&q=80" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #080806;
+      --bg-soft: #11100c;
+      --card: #17150f;
+      --gold: #d6a84f;
+      --gold-soft: #f2d58a;
+      --cream: #fff5df;
+      --muted: #b7aa8c;
+      --text: #f8edd5;
+      --white: #ffffff;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
+      --radius: 26px;
+      --max: 1180px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: "Inter", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    .container {
+      width: min(92%, var(--max));
+      margin: 0 auto;
+    }
+
+    .section {
+      padding: 110px 0;
+    }
+
+    .eyebrow {
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      font-size: 0.78rem;
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
+
+    .section-title {
+      font-family: "Playfair Display", serif;
+      font-size: clamp(2.2rem, 5vw, 4.6rem);
+      line-height: 1;
+      margin-bottom: 22px;
+      letter-spacing: -0.04em;
+    }
+
+    .section-text {
+      color: var(--muted);
+      max-width: 690px;
+      font-size: 1.04rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 50px;
+      padding: 0 22px;
+      border-radius: 999px;
+      border: 1px solid rgba(214, 168, 79, 0.45);
+      background: transparent;
+      color: var(--cream);
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.25s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      border-color: var(--gold);
+      background: rgba(214, 168, 79, 0.08);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--gold), var(--gold-soft));
+      color: #171006;
+      border-color: transparent;
+      box-shadow: 0 15px 35px rgba(214, 168, 79, 0.22);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, var(--gold-soft), var(--gold));
+    }
+
+    .header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 100;
+      padding: 22px 0;
+      transition: 0.3s ease;
+    }
+
+    .header.scrolled {
+      background: rgba(8, 8, 6, 0.82);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 14px 0;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      font-size: 1.35rem;
+    }
+
+    .logo-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(circle at 35% 35%, var(--gold-soft), var(--gold), #674812);
+      color: #130d04;
+      font-family: "Playfair Display", serif;
+      font-weight: 900;
+      box-shadow: 0 12px 30px rgba(214, 168, 79, 0.25);
+    }
+
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      list-style: none;
+      color: rgba(255, 245, 223, 0.82);
+      font-weight: 700;
+      font-size: 0.94rem;
+    }
+
+    .nav-menu a {
+      transition: 0.25s ease;
+    }
+
+    .nav-menu a:hover {
+      color: var(--gold-soft);
+    }
+
+    .menu-toggle {
+      display: none;
+      background: transparent;
+      color: var(--cream);
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 12px;
+      width: 44px;
+      height: 44px;
+      cursor: pointer;
+      font-size: 1.25rem;
+    }
+
+    .hero {
+      min-height: 100vh;
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding: 140px 0 80px;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(8, 8, 6, 0.94), rgba(8, 8, 6, 0.70), rgba(8, 8, 6, 0.92)),
+        url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1800&q=80") center/cover;
+      z-index: -2;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      right: -180px;
+      bottom: -220px;
+      background: radial-gradient(circle, rgba(214, 168, 79, 0.28), transparent 65%);
+      z-index: -1;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.08fr 0.92fr;
+      gap: 52px;
+      align-items: center;
+    }
+
+    .hero h1 {
+      font-family: "Playfair Display", serif;
+      font-size: clamp(3.8rem, 8vw, 7.9rem);
+      line-height: 0.88;
+      letter-spacing: -0.07em;
+      max-width: 760px;
+      margin-bottom: 26px;
+    }
+
+    .hero h1 span {
+      color: var(--gold-soft);
+    }
+
+    .hero p {
+      color: var(--muted);
+      max-width: 610px;
+      font-size: 1.13rem;
+      margin-bottom: 34px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 36px;
+    }
+
+    .hero-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .badge {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,245,223,0.84);
+      font-size: 0.88rem;
+      font-weight: 800;
+    }
+
+    .hero-card {
+      background: rgba(23, 21, 15, 0.72);
+      border: 1px solid rgba(255,255,255,0.13);
+      border-radius: 34px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      transform: rotate(1.2deg);
+    }
+
+    .hero-card img {
+      height: 430px;
+      width: 100%;
+      object-fit: cover;
+      border-radius: 24px;
+    }
+
+    .hero-card-content {
+      padding: 22px 10px 8px;
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: end;
+    }
+
+    .hero-card h3 {
+      font-family: "Playfair Display", serif;
+      font-size: 1.55rem;
+      margin-bottom: 5px;
+    }
+
+    .hero-card p {
+      margin: 0;
+      font-size: 0.95rem;
+    }
+
+    .price {
+      color: var(--gold-soft);
+      font-weight: 900;
+      font-size: 1.2rem;
+      white-space: nowrap;
+    }
+
+    .stats {
+      position: relative;
+      margin-top: -45px;
+      z-index: 2;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      overflow: hidden;
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.1);
+      box-shadow: var(--shadow);
+    }
+
+    .stat {
+      background: rgba(17,16,12,0.92);
+      padding: 30px;
+      backdrop-filter: blur(14px);
+    }
+
+    .stat strong {
+      display: block;
+      font-family: "Playfair Display", serif;
+      color: var(--gold-soft);
+      font-size: 2.2rem;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 0.95fr 1.05fr;
+      gap: 58px;
+      align-items: center;
+    }
+
+    .image-stack {
+      position: relative;
+    }
+
+    .image-stack img {
+      border-radius: 32px;
+      box-shadow: var(--shadow);
+      object-fit: cover;
+    }
+
+    .image-stack .main-img {
+      height: 560px;
+      width: 88%;
+    }
+
+    .image-stack .small-img {
+      position: absolute;
+      right: 0;
+      bottom: -48px;
+      width: 48%;
+      height: 260px;
+      border: 10px solid var(--bg);
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-top: 34px;
+    }
+
+    .feature {
+      padding: 22px;
+      border-radius: 22px;
+      background: var(--bg-soft);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .feature-icon {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+
+    .feature h4 {
+      margin-bottom: 7px;
+      color: var(--cream);
+    }
+
+    .feature p {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .menu-section {
+      background:
+        radial-gradient(circle at top left, rgba(214, 168, 79, 0.12), transparent 36%),
+        var(--bg-soft);
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 26px;
+      align-items: end;
+      margin-bottom: 42px;
+    }
+
+    .menu-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .filter-btn {
+      border: 1px solid rgba(255,255,255,0.11);
+      background: rgba(255,255,255,0.04);
+      color: var(--cream);
+      padding: 10px 15px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 800;
+      transition: 0.25s ease;
+    }
+
+    .filter-btn.active,
+    .filter-btn:hover {
+      background: var(--gold);
+      color: #151006;
+      border-color: var(--gold);
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+    }
+
+    .menu-card {
+      background: rgba(8,8,6,0.66);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 26px;
+      overflow: hidden;
+      transition: 0.28s ease;
+    }
+
+    .menu-card:hover {
+      transform: translateY(-7px);
+      border-color: rgba(214,168,79,0.45);
+      box-shadow: 0 28px 60px rgba(0,0,0,0.25);
+    }
+
+    .menu-card.is-hidden {
+      display: none;
+    }
+
+    .menu-card img {
+      width: 100%;
+      height: 230px;
+      object-fit: cover;
+    }
+
+    .menu-card-body {
+      padding: 22px;
+    }
+
+    .menu-card-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 10px;
+      align-items: start;
+    }
+
+    .menu-card h3 {
+      font-family: "Playfair Display", serif;
+      font-size: 1.45rem;
+      line-height: 1.05;
+    }
+
+    .menu-card p {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .tag {
+      display: inline-block;
+      margin-top: 18px;
+      color: var(--gold-soft);
+      font-size: 0.78rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 900;
+    }
+
+    .experience {
+      padding: 46px;
+      border-radius: 34px;
+      background:
+        linear-gradient(90deg, rgba(0,0,0,0.72), rgba(0,0,0,0.30)),
+        url("https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1600&q=80") center/cover;
+      min-height: 420px;
+      display: flex;
+      align-items: end;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .experience-content {
+      max-width: 640px;
+    }
+
+    .experience h2 {
+      font-family: "Playfair Display", serif;
+      font-size: clamp(2.4rem, 5vw, 4.5rem);
+      line-height: 0.95;
+      margin-bottom: 18px;
+    }
+
+    .experience p {
+      color: rgba(255,245,223,0.78);
+      margin-bottom: 28px;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr 1fr;
+      grid-auto-rows: 220px;
+      gap: 18px;
+    }
+
+    .gallery-item {
+      border-radius: 26px;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .gallery-item.large {
+      grid-row: span 2;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: 0.5s ease;
+    }
+
+    .gallery-item:hover img {
+      transform: scale(1.08);
+    }
+
+    .testimonials {
+      background: var(--bg-soft);
+    }
+
+    .review-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+      margin-top: 42px;
+    }
+
+    .review {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 26px;
+      padding: 28px;
+    }
+
+    .stars {
+      color: var(--gold-soft);
+      letter-spacing: 3px;
+      margin-bottom: 16px;
+    }
+
+    .review p {
+      color: var(--muted);
+      margin-bottom: 22px;
+    }
+
+    .review strong {
+      color: var(--cream);
+    }
+
+    .reservation-grid {
+      display: grid;
+      grid-template-columns: 0.95fr 1.05fr;
+      gap: 38px;
+      align-items: start;
+    }
+
+    .contact-card,
+    .reservation-form {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 30px;
+      padding: 32px;
+      box-shadow: var(--shadow);
+    }
+
+    .contact-list {
+      list-style: none;
+      margin-top: 28px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .contact-list li {
+      color: var(--muted);
+    }
+
+    .contact-list strong {
+      color: var(--cream);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      color: var(--cream);
+      font-weight: 800;
+      font-size: 0.9rem;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.045);
+      color: var(--cream);
+      border-radius: 16px;
+      padding: 14px 15px;
+      outline: none;
+      transition: 0.25s ease;
+    }
+
+    select option {
+      color: #111;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 4px rgba(214,168,79,0.12);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    .form-message {
+      margin-top: 16px;
+      color: var(--gold-soft);
+      font-weight: 800;
+      display: none;
+    }
+
+    .footer {
+      border-top: 1px solid rgba(255,255,255,0.09);
+      padding: 36px 0;
+      color: var(--muted);
+    }
+
+    .footer-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .socials {
+      display: flex;
+      gap: 14px;
+      font-weight: 800;
+    }
+
+    .socials a:hover {
+      color: var(--gold-soft);
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: 0.7s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 980px) {
+      .nav-menu {
+        position: absolute;
+        top: 76px;
+        right: 4%;
+        left: 4%;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        background: rgba(17,16,12,0.96);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 22px;
+        padding: 14px;
+        display: none;
+      }
+
+      .nav-menu.open {
+        display: flex;
+      }
+
+      .nav-menu li a {
+        display: block;
+        padding: 14px;
+      }
+
+      .menu-toggle {
+        display: block;
+      }
+
+      .hero-grid,
+      .about-grid,
+      .reservation-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-card {
+        transform: none;
+      }
+
+      .stats-grid,
+      .menu-grid,
+      .review-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .section-head {
+        align-items: start;
+        flex-direction: column;
+      }
+
+      .gallery-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .section {
+        padding: 80px 0;
+      }
+
+      .hero {
+        padding-top: 125px;
+      }
+
+      .hero-card img {
+        height: 310px;
+      }
+
+      .stats-grid,
+      .menu-grid,
+      .review-grid,
+      .features,
+      .form-grid,
+      .gallery-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stat {
+        padding: 24px;
+      }
+
+      .image-stack .main-img {
+        width: 100%;
+        height: 430px;
+      }
+
+      .image-stack .small-img {
+        position: relative;
+        width: 100%;
+        height: 220px;
+        bottom: auto;
+        margin-top: 18px;
+        border: none;
+      }
+
+      .experience {
+        padding: 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header" id="header">
+    <div class="container nav">
+      <a href="#" class="logo" aria-label="Aurum Restaurant Home">
+        <span class="logo-mark">A</span>
+        <span>Aurum</span>
+      </a>
+
+      <button class="menu-toggle" id="menuToggle" aria-label="Open menu">☰</button>
+
+      <ul class="nav-menu" id="navMenu">
+        <li><a href="#about">About</a></li>
+        <li><a href="#menu">Menu</a></li>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#gallery">Gallery</a></li>
+        <li><a href="#reservation">Reservations</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-content reveal">
+          <p class="eyebrow">Modern Fine Dining</p>
+          <h1>Seasonal food. <span>Timeless</span> atmosphere.</h1>
+          <p>
+            Welcome to Aurum — an elegant restaurant experience built around fire, flavor,
+            craft cocktails, and locally sourced ingredients.
+          </p>
+
+          <div class="hero-actions">
+            <a href="#reservation" class="btn btn-primary">Reserve a Table</a>
+            <a href="#menu" class="btn">View Menu</a>
+          </div>
+
+          <div class="hero-badges">
+            <span class="badge">Michelin-inspired cuisine</span>
+            <span class="badge">Private dining</span>
+            <span class="badge">Craft cocktails</span>
+          </div>
+        </div>
+
+        <article class="hero-card reveal">
+          <img src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1200&q=80" alt="Signature plated restaurant dish">
+          <div class="hero-card-content">
+            <div>
+              <h3>Signature Ribeye</h3>
+              <p>Charred bone marrow, herb butter, smoked sea salt.</p>
+            </div>
+            <span class="price">$42</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="stats">
+      <div class="container stats-grid reveal">
+        <div class="stat">
+          <strong>12+</strong>
+          <span>Years of hospitality</span>
+        </div>
+        <div class="stat">
+          <strong>4.9</strong>
+          <span>Guest rating</span>
+        </div>
+        <div class="stat">
+          <strong>38</strong>
+          <span>Seasonal dishes</span>
+        </div>
+        <div class="stat">
+          <strong>100%</strong>
+          <span>Fresh ingredients</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="about">
+      <div class="container about-grid">
+        <div class="image-stack reveal">
+          <img class="main-img" src="https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&fit=crop&w=1000&q=80" alt="Chef preparing food">
+          <img class="small-img" src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=900&q=80" alt="Restaurant dining room">
+        </div>
+
+        <div class="reveal">
+          <p class="eyebrow">Our Story</p>
+          <h2 class="section-title">Crafted with patience, served with purpose.</h2>
+          <p class="section-text">
+            Our kitchen celebrates bold flavor, slow cooking, and seasonal produce.
+            Every plate is designed to feel refined but comforting — the kind of meal
+            guests remember long after the evening ends.
+          </p>
+
+          <div class="features">
+            <div class="feature">
+              <div class="feature-icon">🔥</div>
+              <h4>Open-fire cooking</h4>
+              <p>Smoked, roasted, and flame-finished dishes with deep natural flavor.</p>
+            </div>
+
+            <div class="feature">
+              <div class="feature-icon">🍷</div>
+              <h4>Curated wine list</h4>
+              <p>Elegant pairings selected to complement every course.</p>
+            </div>
+
+            <div class="feature">
+              <div class="feature-icon">🌿</div>
+              <h4>Seasonal produce</h4>
+              <p>Fresh local ingredients, updated throughout the year.</p>
+            </div>
+
+            <div class="feature">
+              <div class="feature-icon">✨</div>
+              <h4>Private events</h4>
+              <p>Beautiful spaces for celebrations, dinners, and corporate nights.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section menu-section" id="menu">
+      <div class="container">
+        <div class="section-head reveal">
+          <div>
+            <p class="eyebrow">Menu Highlights</p>
+            <h2 class="section-title">A menu made to impress.</h2>
+            <p class="section-text">
+              Replace these items with your restaurant’s real dishes, prices, and descriptions.
+            </p>
+          </div>
+
+          <div class="menu-filters" aria-label="Menu filters">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="starter">Starters</button>
+            <button class="filter-btn" data-filter="main">Mains</button>
+            <button class="filter-btn" data-filter="dessert">Desserts</button>
+            <button class="filter-btn" data-filter="drink">Drinks</button>
+          </div>
+        </div>
+
+        <div class="menu-grid">
+          <article class="menu-card reveal" data-category="starter">
+            <img src="https://images.unsplash.com/photo-1600891964599-f61ba0e24092?auto=format&fit=crop&w=900&q=80" alt="Burrata starter">
+            <div class="menu-card-body">
+              <div class="menu-card-top">
+                <h3>Burrata & Heirloom Tomato</h3>
+                <span class="price">$18</span>
+              </div>
+              <p>Basil oil, toasted sourdough, aged balsamic, cracked pepper.</p>
+              <span class="tag">Starter</span>
+            </div>
+          </article>
+
+          <article class="menu-card reveal" data-category="main">
+            <img src="https://images.unsplash.com/photo-1558030006-450675393462?auto=format&fit=crop&w=900&q=80" alt="Steak main course">
+            <div class="menu-card-body">
+              <div class="menu-card-top">
+                <h3>Dry-Aged Ribeye</h3>
+                <span class="price">$42</span>
+              </div>
+              <p>Bone marrow butter, smoked sea salt, roasted garlic jus.</p>
+              <span class="tag">Main</span>
+            </div>
+          </article>
+
+          <article class="menu-card reveal" data-category="main">
+            <img src="https://images.unsplash.com/photo-1615937657715-bc7b4b7962c1?auto=format&fit=crop&w=900&q=80" alt="Pasta dish">
+            <div class="menu-card-body">
+              <div class="menu-card-top">
+                <h3>Truffle Tagliatelle</h3>
+                <span class="price">$29</span>
+              </div>
+              <p>Fresh pasta, parmesan cream, black truffle, chives.</p>
+              <span class="tag">Main</span>
+            </div>
+          </article>
+
+          <article class="menu-card reveal" data-category="dessert">
+            <img src="https://images.unsplash.com/photo-1565958011703-44f9829ba187?auto=format&fit=crop&w=900&q=80" alt="Dessert cake">
+            <div class="menu-card-body">
+              <div class="menu-card-top">
+                <h3>Chocolate Crémeux</h3>
+                <span class="price">$14</span>
+              </div>
+              <p>Hazelnut crumble, espresso caramel, vanilla cream.</p>
+              <span class="tag">Dessert</span>
+            </div>
+          </article>
+
+          <article class="menu-card reveal" data-category="drink">
+            <img src="https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=900&q=80" alt="Cocktail drink">
+            <div class="menu-card-body">
+              <div class="menu-card-top">
+                <h3>Golden Hour Spritz</h3>
+                <span class="price">$16</span>
+              </div>
+              <p>Aperitivo, citrus, prosecco, rosemary, orange bitters.</p>
+              <span class="tag">Drink</span>
+            </div>
+          </article>
+
+          <article class="menu-card reveal" data-category="starter">
+            <img src="https://images.unsplash.com/photo-1559847844-5315695dadae?auto=format&fit=crop&w=900&q=80" alt="Seafood starter">
+            <div class="menu-card-body">
+              <div class="menu-card-top">
+                <h3>Seared Scallops</h3>
+                <span class="price">$21</span>
+              </div>
+              <p>Cauliflower purée, brown butter, capers, lemon zest.</p>
+              <span class="tag">Starter</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="experience">
+      <div class="container">
+        <div class="experience reveal">
+          <div class="experience-content">
+            <p class="eyebrow">Chef’s Table</p>
+            <h2>A private tasting experience for unforgettable nights.</h2>
+            <p>
+              Host an intimate dinner, celebrate a milestone, or book our chef’s table
+              for a guided multi-course menu with wine pairings.
+            </p>
+            <a href="#reservation" class="btn btn-primary">Book the Experience</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="gallery">
+      <div class="container">
+        <div class="reveal">
+          <p class="eyebrow">Gallery</p>
+          <h2 class="section-title">Atmosphere, flavor, detail.</h2>
+        </div>
+
+        <div class="gallery-grid reveal">
+          <div class="gallery-item large">
+            <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80" alt="Elegant restaurant table">
+          </div>
+          <div class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=900&q=80" alt="Restaurant dining">
+          </div>
+          <div class="gallery-item large">
+            <img src="https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=1000&q=80" alt="Restaurant interior">
+          </div>
+          <div class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?auto=format&fit=crop&w=900&q=80" alt="Fine dining dish">
+          </div>
+          <div class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=900&q=80" alt="Guests dining">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section testimonials">
+      <div class="container">
+        <div class="reveal">
+          <p class="eyebrow">Guest Reviews</p>
+          <h2 class="section-title">Loved by locals and visitors.</h2>
+        </div>
+
+        <div class="review-grid">
+          <article class="review reveal">
+            <div class="stars">★★★★★</div>
+            <p>“The entire evening felt elevated and thoughtful — from the first pour to the final bite.”</p>
+            <strong>— Emma L.</strong>
+          </article>
+
+          <article class="review reveal">
+            <div class="stars">★★★★★</div>
+            <p>“Beautiful service, refined flavors, and a room that instantly makes you want to stay longer.”</p>
+            <strong>— Daniel R.</strong>
+          </article>
+
+          <article class="review reveal">
+            <div class="stars">★★★★★</div>
+            <p>“A premium dining experience with warm hospitality and a truly memorable menu.”</p>
+            <strong>— Sofia M.</strong>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="reservation">
+      <div class="container reservation-grid">
+        <div class="contact-card reveal">
+          <p class="eyebrow">Visit Us</p>
+          <h2 class="section-title">Reserve your evening.</h2>
+          <p class="section-text">Book a table for a special dinner, private event, or chef’s tasting evening.</p>
+          <ul class="contact-list">
+            <li><strong>Address</strong> 18 Gold Lane, Downtown</li>
+            <li><strong>Hours</strong> Tue–Sun · 5:30 PM to 11:00 PM</li>
+            <li><strong>Contact</strong> reservations@aurum.example</li>
+          </ul>
+        </div>
+
+        <form class="reservation-form reveal" id="reservationForm">
+          <div class="form-grid">
+            <div class="field">
+              <label for="name">Name</label>
+              <input id="name" name="name" type="text" placeholder="Your name" required>
+            </div>
+
+            <div class="field">
+              <label for="phone">Phone</label>
+              <input id="phone" name="phone" type="tel" placeholder="Your phone" required>
+            </div>
+
+            <div class="field">
+              <label for="date">Date</label>
+              <input id="date" name="date" type="date" required>
+            </div>
+
+            <div class="field">
+              <label for="guests">Guests</label>
+              <select id="guests" name="guests">
+                <option>2 Guests</option>
+                <option>4 Guests</option>
+                <option>6 Guests</option>
+                <option>8+ Guests</option>
+              </select>
+            </div>
+
+            <div class="field full">
+              <label for="message">Special request</label>
+              <textarea id="message" name="message" placeholder="Tell us about your occasion"></textarea>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="margin-top: 18px;">Request Reservation</button>
+          <div class="form-message" id="formMessage">Thanks — your reservation request has been prepared.</div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-content">
+      <span>© <span id="year"></span> Aurum Restaurant</span>
+      <div class="socials">
+        <a href="#">Instagram</a>
+        <a href="#">Facebook</a>
+        <a href="#">LinkedIn</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const header = document.getElementById('header');
+    const menuToggle = document.getElementById('menuToggle');
+    const navMenu = document.getElementById('navMenu');
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const menuCards = document.querySelectorAll('.menu-card');
+    const reservationForm = document.getElementById('reservationForm');
+    const formMessage = document.getElementById('formMessage');
+    const year = document.getElementById('year');
+
+    window.addEventListener('scroll', () => {
+      header.classList.toggle('scrolled', window.scrollY > 8);
+    });
+
+    menuToggle.addEventListener('click', () => {
+      navMenu.classList.toggle('open');
+    });
+
+    filterButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        filterButtons.forEach((btn) => btn.classList.remove('active'));
+        button.classList.add('active');
+        const filter = button.dataset.filter;
+
+        menuCards.forEach((card) => {
+          const match = filter === 'all' || card.dataset.category === filter;
+          card.classList.toggle('is-hidden', !match);
+        });
+      });
+    });
+
+    reservationForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      formMessage.style.display = 'block';
+      reservationForm.reset();
+    });
+
+    year.textContent = new Date().getFullYear();
+
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    reveals.forEach((reveal) => observer.observe(reveal));
+  </script>
+</body>
+</html>
