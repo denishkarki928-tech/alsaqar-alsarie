@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AlSaqar AlSarie — Ad Campaign Hub</title>
+<meta name="description" content="Preview the three AlSaqar AlSarie vertical ad variants and their CapCut scripts.">
+<style>
+  :root{
+    --bg:#FBF2E4; --bg-alt:#F2E1C6; --surface:#FFFCF6;
+    --ink:#2A1B10; --ink-soft:#5C4630; --ink-faint:#8C7358;
+    --primary:#A8451C; --primary-deep:#7A2F12; --accent:#C9962C;
+    --gold:linear-gradient(115deg,#9C6B1F 0%,#E8C873 22%,#C9962C 45%,#F3DE9F 60%,#A9791F 82%,#E8C873 100%);
+    --hairline:rgba(42,27,16,.16); --shadow:0 20px 50px -22px rgba(96,52,18,.32);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5;
+    padding:clamp(24px,5vw,64px) clamp(18px,4vw,40px)}
+  .serif{font-family:Georgia,"Times New Roman",serif}
+  .wrap{max-width:1040px;margin:0 auto}
+
+  header{text-align:center;margin-bottom:clamp(32px,5vw,56px)}
+  .eyebrow{font-size:14px;letter-spacing:.32em;text-transform:uppercase;color:var(--primary);
+    font-weight:700;margin-bottom:16px}
+  h1{font-size:clamp(34px,6vw,56px);line-height:1.05;letter-spacing:-.02em;font-weight:800}
+  h1 .g{background:var(--gold);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{color:var(--ink-soft);font-size:clamp(16px,2.4vw,19px);margin-top:18px;max-width:640px;
+    margin-inline:auto}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:clamp(18px,3vw,28px)}
+  .card{background:var(--surface);border:1px solid var(--hairline);border-radius:22px;
+    padding:28px 26px 26px;box-shadow:var(--shadow);display:flex;flex-direction:column;
+    transition:transform .25s cubic-bezier(.2,.7,.2,1),box-shadow .25s}
+  .card:hover{transform:translateY(-4px);box-shadow:0 30px 70px -24px rgba(96,52,18,.4)}
+  .tag{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:800;
+    letter-spacing:.1em;text-transform:uppercase;color:#3a2408;background:var(--gold);
+    padding:7px 14px;border-radius:100px;margin-bottom:18px}
+  .card h2{font-size:26px;letter-spacing:-.01em;font-weight:800;line-height:1.15}
+  .angle{color:var(--ink-soft);font-size:15.5px;margin-top:10px;flex:1}
+  .meta{color:var(--ink-faint);font-size:13px;margin-top:14px;font-weight:600;letter-spacing:.02em}
+  .actions{display:flex;gap:10px;margin-top:22px}
+  .btn{flex:1;text-align:center;text-decoration:none;font-weight:700;font-size:15px;
+    padding:13px 14px;border-radius:12px;transition:filter .2s,background .2s}
+  .btn.play{background:var(--primary);color:#fff}
+  .btn.play:hover{filter:brightness(1.08)}
+  .btn.script{background:var(--bg-alt);color:var(--primary-deep);border:1px solid var(--hairline)}
+  .btn.script:hover{background:#ecd7b6}
+
+  .how{margin-top:clamp(40px,6vw,64px);background:var(--surface);border:1px solid var(--hairline);
+    border-radius:22px;padding:clamp(24px,4vw,36px);box-shadow:var(--shadow)}
+  .how h3{font-size:20px;font-weight:800;margin-bottom:14px}
+  .how ol{margin:0;padding-left:22px;color:var(--ink-soft);font-size:15.5px}
+  .how li{margin:8px 0}
+  .how b{color:var(--ink)}
+  footer{text-align:center;color:var(--ink-faint);font-size:13px;margin-top:40px}
+  footer a{color:var(--primary);text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">AlSaqar AlSarie · Campaign</div>
+    <h1 class="serif">Three vertical ads,<br>one <span class="g">home-help brand</span></h1>
+    <p class="lede">Each is a ready-to-record 9:16 promo (open, hit <b>Replay</b>, screen-record) plus a matching CapCut script. A/B/C test which angle converts.</p>
+  </header>
+
+  <div class="grid">
+    <!-- A -->
+    <div class="card">
+      <span class="tag">Variant A · Sparkling</span>
+      <h2 class="serif">Sparkling results</h2>
+      <p class="angle">Before → after transformation. Emotional and satisfying — sells the spotless outcome. Dim, tired home swings to a bright, sparkling one.</p>
+      <p class="meta">9:16 · ~20s · loops</p>
+      <div class="actions">
+        <a class="btn play" href="ad.html">▶ Play ad</a>
+        <a class="btn script" href="ad-script.md">Script</a>
+      </div>
+    </div>
+    <!-- B -->
+    <div class="card">
+      <span class="tag">Variant B · Trusted</span>
+      <h2 class="serif">Professional &amp; trusted</h2>
+      <p class="angle">Peace of mind. Vetting, reliability and the same trusted person every month. Calm, premium, warm — with a "500+ families" trust ribbon.</p>
+      <p class="meta">9:16 · ~20s · loops</p>
+      <div class="actions">
+        <a class="btn play" href="ad-trusted.html">▶ Play ad</a>
+        <a class="btn script" href="ad-script-trusted.md">Script</a>
+      </div>
+    </div>
+    <!-- C -->
+    <div class="card">
+      <span class="tag">Variant C · Fast</span>
+      <h2 class="serif">Fast &amp; affordable</h2>
+      <p class="angle">Speed and value. No agencies, no hidden fees, book on WhatsApp in minutes. Snappy pacing, "Book in 60 sec" badge, price as the hero.</p>
+      <p class="meta">9:16 · ~17s · loops</p>
+      <div class="actions">
+        <a class="btn play" href="ad-fast.html">▶ Play ad</a>
+        <a class="btn script" href="ad-script-fast.md">Script</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="how">
+    <h3>Turn any variant into a shareable MP4</h3>
+    <ol>
+      <li>Open the ad and click <b>▶ Play ad</b>, then hit <b>Replay</b> to start it from the top.</li>
+      <li>Screen-record just the vertical frame — <b>QuickTime</b> (Mac: File → New Screen Recording) or your phone's screen recorder.</li>
+      <li>Trim to the ~20s loop and post to <b>TikTok / Reels / Shorts</b>. Done — no filming required.</li>
+      <li>Prefer real footage? Follow the matching <b>Script</b> in free CapCut (search terms + steps included).</li>
+    </ol>
+  </div>
+
+  <footer>
+    AlSaqar AlSarie · Trusted by 500+ Dubai families · WhatsApp <a href="https://wa.me/971504198901">+971 50 419 8901</a>
+  </footer>
+</div>
+</body>
+</html>
