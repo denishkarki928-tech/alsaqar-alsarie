@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>الصقر السريع — إعلان عمودي (الثقة)</title>
+<style>
+  :root{--ink:#2A1B10;--accent:#C9962C;--accent-soft:#E8C873;
+    --gold:linear-gradient(115deg,#9C6B1F 0%,#E8C873 22%,#C9962C 45%,#F3DE9F 60%,#A9791F 82%,#E8C873 100%)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#0d0805;display:grid;place-items:center;
+    font-family:"Segoe UI","Tahoma","Geeza Pro","Al Bayan",Arial,sans-serif;overflow:hidden}
+  .stage{position:fixed;top:50%;left:50%;width:1080px;height:1920px;overflow:hidden;
+    transform-origin:center;background:var(--ink);box-shadow:0 40px 120px -30px rgba(0,0,0,.8);
+    transform:translate(-50%,-50%) scale(var(--k,.35))}
+  .room{position:absolute;inset:-4%;background:url("assets/home-cleaning.jpg") center/cover no-repeat;
+    filter:brightness(1.04) saturate(1.08) contrast(1.02);animation:drift 22s ease-in-out infinite alternate}
+  @keyframes drift{0%{transform:scale(1.02) translate(0,0)}100%{transform:scale(1.11) translate(2%,-1.5%)}}
+  .scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(13,8,5,.28) 0%,rgba(13,8,5,.05) 34%,rgba(13,8,5,.55) 72%,rgba(13,8,5,.9) 100%);transition:opacity .8s ease}
+  .stage.deep .scrim{opacity:1}
+  .wash{position:absolute;inset:0;background:radial-gradient(120% 80% at 50% 30%,rgba(201,150,44,.12),transparent 60%);mix-blend-mode:screen;pointer-events:none}
+  .ribbon{position:absolute;top:70px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:16px;
+    padding:18px 34px;border-radius:100px;background:rgba(13,8,5,.42);border:1px solid rgba(232,200,115,.5);backdrop-filter:blur(4px);
+    color:var(--accent-soft);font-size:34px;font-weight:700;opacity:0;transition:opacity .7s ease .2s;white-space:nowrap}
+  .stage.showribbon .ribbon{opacity:1}
+  .ribbon .star{color:#F3DE9F;font-size:36px}
+  .layer{position:absolute;inset:0;padding:120px 90px;display:flex;flex-direction:column;justify-content:flex-end;
+    align-items:flex-start;text-align:right;opacity:0;transition:opacity .7s ease,transform .8s cubic-bezier(.2,.7,.2,1);transform:translateY(30px)}
+  .layer.on{opacity:1;transform:translateY(0)}
+  .kicker{font-size:36px;color:var(--accent-soft);font-weight:700;margin-bottom:26px}
+  .head{color:#FFF9ED;font-weight:800;line-height:1.2;font-size:110px;text-shadow:0 6px 40px rgba(0,0,0,.6)}
+  .head .g{background:var(--gold);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:#F2E1C6;font-size:46px;line-height:1.5;margin-top:34px;max-width:880px;font-weight:500}
+  .badges{display:flex;flex-direction:column;gap:30px;margin-top:6px;align-items:flex-start}
+  .badge{display:flex;align-items:center;gap:28px;color:#FFF9ED;font-size:52px;font-weight:700;line-height:1.25}
+  .tick{width:66px;height:66px;border-radius:50%;flex:none;background:var(--gold);display:grid;place-items:center;box-shadow:0 0 30px rgba(201,150,44,.55)}
+  .tick svg{width:34px;height:34px}
+  .price{color:#FFF9ED;font-weight:800;line-height:1.2;text-align:right}
+  .price .from{display:block;font-size:42px;color:var(--accent-soft);font-weight:700;margin-bottom:16px}
+  .price .amt{font-size:150px;white-space:nowrap}
+  .price .per{font-size:46px;color:#F2E1C6;font-weight:600;margin-top:18px}
+  .cta{align-items:center;justify-content:center;text-align:center;
+    background:radial-gradient(78% 58% at 50% 46%,rgba(13,8,5,.9) 0%,rgba(13,8,5,.72) 55%,rgba(13,8,5,.5) 100%)}
+  .logo{width:190px;height:190px;border-radius:50%;object-fit:cover;border:4px solid transparent;background:var(--gold) border-box;box-shadow:0 20px 60px -18px rgba(0,0,0,.7);margin-bottom:44px}
+  .brand{font-size:118px;font-weight:800;line-height:1.1;color:#FFF9ED}
+  .brand .g{background:var(--gold);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .trust{font-size:44px;color:var(--accent-soft);margin-top:26px;font-weight:700}
+  .book{margin-top:56px;display:inline-flex;align-items:center;gap:22px;background:var(--gold);color:#3a2408;font-weight:800;font-size:56px;padding:34px 64px;border-radius:100px;box-shadow:0 24px 60px -16px rgba(201,150,44,.6)}
+  .phone{margin-top:40px;font-size:54px;color:#FFF9ED;font-weight:700;direction:ltr}
+  .wa{font-size:40px;color:#8fe3a0;margin-top:18px;font-weight:700}
+  .vig{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 240px 60px rgba(0,0,0,.55)}
+  .replay{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#1c130a;color:#F2E1C6;border:1px solid #4a341c;border-radius:100px;padding:12px 26px;font-size:15px;font-weight:600;cursor:pointer;z-index:20}
+</style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <div class="room"></div><div class="wash"></div><div class="scrim"></div>
+    <div class="ribbon"><span class="star">★</span> موثوق من أكثر من ٥٠٠ عائلة في دبي</div>
+
+    <div class="layer" data-scene="hook">
+      <div class="kicker">منزلكِ · عائلتكِ</div>
+      <div class="head">بمن تثقين<br>في <span class="g">منزلكِ؟</span></div>
+      <div class="sub">إدخال شخصٍ إلى منزلك ليس أمراً بسيطاً — إنها مسألة ثقة.</div>
+    </div>
+
+    <div class="layer" data-scene="answer">
+      <div class="kicker">خدمة منزلية موثوقة في دبي</div>
+      <div class="head">المساعدة التي<br><span class="g">تعتمد عليها العائلات.</span></div>
+      <div class="sub">موثوقة، يُعتمد عليها، وتهتمّ بصدق — في أكثر من ٥٠٠ منزل بدبي.</div>
+    </div>
+
+    <div class="layer" data-scene="value">
+      <div class="kicker">لماذا تختارنا العائلات</div>
+      <div class="badges">
+        <div class="badge"><span class="tick"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6" stroke="#3a2408" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span> تم التحقق من خلفيتها</div>
+        <div class="badge"><span class="tick"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6" stroke="#3a2408" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span> نفس الشخص الموثوق</div>
+        <div class="badge"><span class="tick"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6" stroke="#3a2408" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span> تنظيف · طبخ · رعاية أطفال</div>
+      </div>
+      <div class="sub">شخصٌ واحدٌ يُعتمد عليه تعرفينه — شهراً بعد شهر.</div>
+    </div>
+
+    <div class="layer" data-scene="price">
+      <div class="price">
+        <span class="from">رعايةٌ موثوقة، من</span>
+        <span class="amt">2,700 درهم</span>
+        <span class="per">خطة شهرية واحدة بسيطة.</span>
+      </div>
+    </div>
+
+    <div class="layer cta" data-scene="cta">
+      <img class="logo" src="assets/logo.png" alt="الصقر السريع">
+      <div class="brand">الصقر <span class="g">السريع</span></div>
+      <div class="trust">موثوق من أكثر من ٥٠٠ عائلة في دبي</div>
+      <div class="book">احجز عبر واتساب ←</div>
+      <div class="phone">+971 50 419 8901</div>
+      <div class="wa">راسلنا اليوم</div>
+    </div>
+    <div class="vig"></div>
+  </div>
+  <button class="replay" id="replay">↺ إعادة التشغيل</button>
+<script>
+  const stage=document.getElementById('stage');
+  const fit=()=>stage.style.setProperty('--k',Math.min(innerWidth/1080,innerHeight/1920));
+  addEventListener('resize',fit);fit();
+  const layers=[...document.querySelectorAll('.layer')];
+  const show=n=>layers.forEach(l=>l.classList.toggle('on',l.dataset.scene===n));
+  let timers=[];const at=(ms,fn)=>timers.push(setTimeout(fn,ms));
+  function play(){
+    timers.forEach(clearTimeout);timers=[];stage.classList.remove('deep');show('hook');
+    at(300,()=>{stage.classList.add('showribbon');show('hook');});
+    at(3400,()=>show('answer'));
+    at(7000,()=>{stage.classList.add('deep');show('value');});
+    at(11500,()=>show('price'));
+    at(15200,()=>{stage.classList.remove('showribbon');show('cta');});
+    at(20500,()=>play());
+  }
+  document.getElementById('replay').addEventListener('click',play);play();
+</script>
+</body>
+</html>
