@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AlSaqar AlSarie — Vertical Ad · Fast &amp; Affordable (9:16)</title>
+<style>
+  :root{
+    --bg:#FBF2E4; --ink:#2A1B10; --ink-soft:#5C4630;
+    --primary:#A8451C; --primary-deep:#7A2F12;
+    --accent:#C9962C; --accent-soft:#E8C873;
+    --gold:linear-gradient(115deg,#9C6B1F 0%,#E8C873 22%,#C9962C 45%,#F3DE9F 60%,#A9791F 82%,#E8C873 100%);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#0d0805;display:grid;place-items:center;
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
+  .serif{font-family:Georgia,"Times New Roman",serif}
+
+  .stage{
+    position:fixed;top:50%;left:50%;width:1080px;height:1920px;overflow:hidden;
+    transform-origin:center;background:var(--ink);
+    box-shadow:0 40px 120px -30px rgba(0,0,0,.8);
+    transform:translate(-50%,-50%) scale(var(--k,.35));
+  }
+
+  /* Room — bright, energetic; subtle punch-in on each scene change */
+  .room{position:absolute;inset:-3%;background:url("assets/home-cleaning.jpg") center/cover no-repeat;
+    filter:brightness(1.05) saturate(1.14) contrast(1.03);transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+  .stage.punch .room{transform:scale(1.05)}
+  .scrim{position:absolute;inset:0;background:
+      linear-gradient(180deg,rgba(13,8,5,.2) 0%,rgba(13,8,5,.02) 34%,rgba(13,8,5,.5) 70%,rgba(13,8,5,.9) 100%)}
+
+  /* speed streak that zips across on scene change */
+  .streak{position:absolute;top:0;left:-40%;width:40%;height:100%;
+    background:linear-gradient(105deg,transparent,rgba(255,248,230,.5),transparent);
+    transform:skewX(-14deg);opacity:0;pointer-events:none}
+  .stage.zip .streak{animation:zip .55s cubic-bezier(.4,0,.2,1)}
+  @keyframes zip{0%{left:-45%;opacity:0}20%{opacity:1}100%{left:130%;opacity:0}}
+
+  /* corner flash badge */
+  .flash{position:absolute;top:70px;right:70px;display:flex;align-items:center;gap:12px;
+    padding:16px 30px;border-radius:100px;background:var(--gold);color:#3a2408;
+    font-size:32px;font-weight:800;letter-spacing:.04em;box-shadow:0 12px 30px -8px rgba(201,150,44,.6);
+    opacity:0;transform:translateY(-14px);transition:opacity .5s ease,transform .5s ease}
+  .stage.showflash .flash{opacity:1;transform:translateY(0)}
+
+  .layer{position:absolute;inset:0;padding:120px 90px;display:flex;flex-direction:column;
+    justify-content:flex-end;opacity:0;transition:opacity .45s ease,transform .55s cubic-bezier(.2,.8,.2,1);
+    transform:translateY(38px) scale(.98)}
+  .layer.on{opacity:1;transform:translateY(0) scale(1)}
+  .kicker{font-size:34px;letter-spacing:.34em;text-transform:uppercase;color:var(--accent-soft);
+    font-weight:700;margin-bottom:24px}
+  .head{color:#FFF9ED;font-weight:800;line-height:1.02;font-size:110px;letter-spacing:-.03em;
+    text-shadow:0 6px 40px rgba(0,0,0,.6)}
+  .head .u{position:relative;white-space:nowrap;background:var(--gold);
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .head .u::after{content:"";position:absolute;left:0;right:0;bottom:-14px;height:12px;border-radius:8px;
+    background:var(--gold);transform:scaleX(0);transform-origin:left;opacity:.9}
+  .layer.on .head .u::after{animation:underline .5s .25s cubic-bezier(.2,.7,.2,1) forwards}
+  @keyframes underline{to{transform:scaleX(1)}}
+  .sub{color:#F2E1C6;font-size:44px;line-height:1.3;margin-top:32px;max-width:840px;font-weight:500}
+
+  /* quick value row */
+  .row{display:flex;flex-wrap:wrap;gap:18px;margin-top:4px}
+  .pill{display:inline-flex;align-items:center;gap:14px;padding:20px 34px;border-radius:100px;
+    background:rgba(255,249,237,.1);border:1.5px solid rgba(232,200,115,.55);
+    color:#FFF9ED;font-size:44px;font-weight:700}
+  .pill b{color:var(--accent-soft)}
+
+  /* PRICE — hero of this variant */
+  .price{color:#FFF9ED;font-weight:800;line-height:1;letter-spacing:-.02em}
+  .price .from{display:block;font-size:40px;letter-spacing:.28em;text-transform:uppercase;
+    color:var(--accent-soft);font-weight:700;margin-bottom:16px}
+  .price .amt{font-size:150px;white-space:nowrap;display:inline-block;position:relative}
+  .price .amt small{font-size:58px}
+  .price .amt::after{content:"";position:absolute;left:0;right:18%;bottom:2px;height:14px;border-radius:8px;
+    background:var(--gold);transform:scaleX(0);transform-origin:left}
+  .layer.on .price .amt::after{animation:underline .55s .3s cubic-bezier(.2,.7,.2,1) forwards}
+  .price .per{font-size:44px;color:#F2E1C6;font-weight:600;margin-top:20px}
+
+  .cta{align-items:center;justify-content:center;text-align:center;
+    background:radial-gradient(78% 58% at 50% 46%,rgba(13,8,5,.9) 0%,rgba(13,8,5,.72) 55%,rgba(13,8,5,.5) 100%)}
+  .logo{width:190px;height:190px;border-radius:50%;object-fit:cover;
+    border:4px solid transparent;background:var(--gold) border-box;
+    box-shadow:0 20px 60px -18px rgba(0,0,0,.7);margin-bottom:44px}
+  .brand{font-size:104px;font-weight:700;line-height:1;letter-spacing:-.01em;color:#FFF9ED}
+  .brand .g{background:var(--gold);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .trust{font-size:40px;color:var(--accent-soft);letter-spacing:.06em;margin-top:26px;font-weight:600}
+  .book{margin-top:56px;display:inline-flex;align-items:center;gap:22px;
+    background:var(--gold);color:#3a2408;font-weight:800;font-size:52px;
+    padding:34px 64px;border-radius:100px;box-shadow:0 24px 60px -16px rgba(201,150,44,.6)}
+  .phone{margin-top:40px;font-size:52px;color:#FFF9ED;font-weight:700;letter-spacing:.02em}
+  .wa{font-size:34px;color:#8fe3a0;letter-spacing:.28em;text-transform:uppercase;margin-top:18px;font-weight:600}
+
+  .vig{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 240px 60px rgba(0,0,0,.55)}
+
+  .replay{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);
+    background:#1c130a;color:#F2E1C6;border:1px solid #4a341c;border-radius:100px;
+    padding:12px 26px;font-size:15px;font-weight:600;cursor:pointer;z-index:20;
+    font-family:system-ui,sans-serif;letter-spacing:.02em}
+  .replay:hover{background:#2a1c0e}
+</style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <div class="room"></div>
+    <div class="scrim"></div>
+    <div class="streak"></div>
+    <div class="flash">⚡ Book in 60 sec</div>
+
+    <!-- 1: HOOK -->
+    <div class="layer" data-scene="hook">
+      <div class="kicker">No agencies · No hassle</div>
+      <div class="head serif">Home help,<br>sorted in <span class="u">minutes.</span></div>
+      <div class="sub">Skip the agencies, the paperwork and the markups.</div>
+    </div>
+
+    <!-- 2: HOW EASY -->
+    <div class="layer" data-scene="easy">
+      <div class="kicker">It's this simple</div>
+      <div class="head serif">One message.<br>One helper. <span class="u">Done.</span></div>
+      <div class="sub">Book the whole thing on WhatsApp — today.</div>
+    </div>
+
+    <!-- 3: ALL INCLUDED -->
+    <div class="layer" data-scene="value">
+      <div class="kicker">All included</div>
+      <div class="row">
+        <span class="pill">🧹 Cleaning</span>
+        <span class="pill">🍳 Cooking</span>
+        <span class="pill">👶 Baby care</span>
+      </div>
+      <div class="sub">Everything your home needs — <b style="color:#E8C873">no hidden fees.</b></div>
+    </div>
+
+    <!-- 4: PRICE (hero) -->
+    <div class="layer" data-scene="price">
+      <div class="price">
+        <span class="from">All of it, from just</span>
+        <span class="amt">AED&nbsp;2,700<small>/mo</small></span>
+        <span class="per">That's it. All-in. Every month.</span>
+      </div>
+    </div>
+
+    <!-- 5: CTA -->
+    <div class="layer cta" data-scene="cta">
+      <img class="logo" src="assets/logo.png" alt="AlSaqar AlSarie">
+      <div class="brand serif">AlSaqar <span class="g">AlSarie</span></div>
+      <div class="trust">Trusted by 500+ Dubai families</div>
+      <div class="book">Book on WhatsApp →</div>
+      <div class="phone">+971 50 419 8901</div>
+      <div class="wa">Message us today</div>
+    </div>
+
+    <div class="vig"></div>
+  </div>
+
+  <button class="replay" id="replay">↺ Replay ad</button>
+
+<script>
+  const stage = document.getElementById('stage');
+  const fit = () => stage.style.setProperty('--k',
+    Math.min(innerWidth/1080, innerHeight/1920));
+  addEventListener('resize', fit); fit();
+
+  const layers = [...document.querySelectorAll('.layer')];
+  const show = name => layers.forEach(l => l.classList.toggle('on', l.dataset.scene === name));
+  let timers = [];
+  const at = (ms, fn) => timers.push(setTimeout(fn, ms));
+
+  // snappy scene change: zip streak + brief punch-in on the room
+  function beat(name, flash){
+    stage.classList.remove('zip'); void stage.offsetWidth; stage.classList.add('zip','punch');
+    setTimeout(() => stage.classList.remove('punch'), 620);
+    stage.classList.toggle('showflash', !!flash);
+    show(name);
+  }
+
+  function play(){
+    timers.forEach(clearTimeout); timers = [];
+    stage.classList.remove('showflash');
+    show('hook');
+    at(250,   () => beat('hook', false));
+    at(3000,  () => beat('easy', true));
+    at(5900,  () => beat('value', false));
+    at(8900,  () => beat('price', true));
+    at(12400, () => { stage.classList.remove('showflash'); beat('cta', false); });
+    at(17500, () => play());
+  }
+  document.getElementById('replay').addEventListener('click', play);
+  play();
+</script>
+</body>
+</html>
