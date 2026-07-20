@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AlSaqar AlSarie — Vertical Ad (9:16)</title>
+<style>
+  :root{
+    --bg:#FBF2E4; --ink:#2A1B10; --ink-soft:#5C4630;
+    --primary:#A8451C; --primary-deep:#7A2F12;
+    --accent:#C9962C; --accent-soft:#E8C873;
+    --gold:linear-gradient(115deg,#9C6B1F 0%,#E8C873 22%,#C9962C 45%,#F3DE9F 60%,#A9791F 82%,#E8C873 100%);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#0d0805;display:grid;place-items:center;
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
+  .serif{font-family:Georgia,"Times New Roman",serif}
+
+  /* 9:16 stage, scaled to viewport height */
+  .stage{
+    position:fixed;top:50%;left:50%;width:1080px;height:1920px;overflow:hidden;
+    transform-origin:center;background:var(--ink);
+    box-shadow:0 40px 120px -30px rgba(0,0,0,.8);
+    transform:translate(-50%,-50%) scale(var(--k,.35));
+  }
+
+  /* ---- Room (before -> after) ---- */
+  .room{position:absolute;inset:0;background:url("assets/home-cleaning.jpg") center/cover no-repeat;
+    filter:brightness(.5) saturate(.55) contrast(.95);transition:filter 1.6s cubic-bezier(.2,.7,.2,1)}
+  .stage.clean .room{filter:brightness(1.08) saturate(1.2) contrast(1.03)}
+  .grime{position:absolute;inset:0;background:
+      radial-gradient(120% 90% at 50% 40%,rgba(0,0,0,0) 30%,rgba(20,12,4,.7) 100%),
+      linear-gradient(180deg,rgba(40,26,10,.55),rgba(20,12,4,.75));
+    mix-blend-mode:multiply;opacity:1;transition:opacity 1.4s ease}
+  .stage.clean .grime{opacity:0}
+  .scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(13,8,5,.15) 0%,rgba(13,8,5,.05) 40%,rgba(13,8,5,.72) 100%);
+    opacity:.35;transition:opacity 1s ease}
+  .stage.reading .scrim{opacity:.86}
+
+  /* sheen wipe during reveal */
+  .sheen{position:absolute;top:0;left:-40%;width:40%;height:100%;
+    background:linear-gradient(105deg,transparent,rgba(255,248,230,.55),transparent);
+    transform:skewX(-14deg);opacity:0;pointer-events:none}
+  .stage.wipe .sheen{animation:wipe 1.3s cubic-bezier(.4,0,.2,1) forwards}
+  @keyframes wipe{0%{left:-45%;opacity:0}12%{opacity:1}100%{left:130%;opacity:0}}
+
+  /* sparkles */
+  .spark{position:absolute;width:26px;height:26px;opacity:0;
+    background:radial-gradient(closest-side,#fff 0%,rgba(255,255,255,.5) 40%,transparent 70%)}
+  .spark::before,.spark::after{content:"";position:absolute;inset:0;
+    background:linear-gradient(#fff,#fff) center/100% 12% no-repeat,
+               linear-gradient(#fff,#fff) center/12% 100% no-repeat}
+  .stage.clean .spark{animation:tw 2.6s ease-in-out infinite}
+  @keyframes tw{0%,100%{opacity:0;transform:scale(.4) rotate(0)}
+    50%{opacity:.95;transform:scale(1) rotate(45deg)}}
+  .s1{top:24%;left:18%;animation-delay:.1s}.s2{top:35%;left:74%;width:34px;height:34px;animation-delay:.5s}
+  .s3{top:52%;left:30%;width:20px;height:20px;animation-delay:.9s}.s4{top:44%;left:58%;animation-delay:1.3s}
+  .s5{top:62%;left:80%;width:30px;height:30px;animation-delay:.3s}.s6{top:28%;left:46%;width:18px;height:18px;animation-delay:1.7s}
+
+  /* ---- Text scenes ---- */
+  .layer{position:absolute;inset:0;padding:120px 90px;display:flex;flex-direction:column;
+    justify-content:flex-end;opacity:0;transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1);
+    transform:translateY(28px)}
+  .layer.on{opacity:1;transform:translateY(0)}
+  .kicker{font-size:34px;letter-spacing:.42em;text-transform:uppercase;color:var(--accent-soft);
+    font-weight:600;margin-bottom:26px}
+  .head{color:#FFF9ED;font-weight:800;line-height:1.03;font-size:104px;letter-spacing:-.02em;
+    text-shadow:0 6px 40px rgba(0,0,0,.55)}
+  .head .g{background:var(--gold);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:#F2E1C6;font-size:44px;line-height:1.32;margin-top:34px;max-width:820px;font-weight:500}
+
+  /* value list */
+  .chips{display:flex;flex-direction:column;gap:22px;margin-top:12px}
+  .chip{display:flex;align-items:center;gap:26px;color:#FFF9ED;font-size:52px;font-weight:600}
+  .dot{width:20px;height:20px;border-radius:50%;background:var(--gold);flex:none;
+    box-shadow:0 0 26px rgba(201,150,44,.7)}
+
+  /* price */
+  .price{color:#FFF9ED;font-weight:800;line-height:1;letter-spacing:-.02em}
+  .price .from{display:block;font-size:40px;letter-spacing:.3em;text-transform:uppercase;
+    color:var(--accent-soft);font-weight:600;margin-bottom:18px}
+  .price .amt{font-size:134px;white-space:nowrap}
+  .price .amt small{font-size:54px}
+  .price .per{font-size:44px;color:#F2E1C6;font-weight:500;margin-top:14px}
+
+  /* CTA card */
+  .cta{align-items:center;justify-content:center;text-align:center;
+    background:radial-gradient(78% 58% at 50% 46%,rgba(13,8,5,.9) 0%,rgba(13,8,5,.72) 55%,rgba(13,8,5,.5) 100%)}
+  .logo{width:190px;height:190px;border-radius:50%;object-fit:cover;
+    border:4px solid transparent;background:var(--gold) border-box;
+    box-shadow:0 20px 60px -18px rgba(0,0,0,.7);margin-bottom:44px}
+  .brand{font-size:104px;font-weight:700;line-height:1;letter-spacing:-.01em;color:#FFF9ED}
+  .brand .g{background:var(--gold);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .trust{font-size:40px;color:var(--accent-soft);letter-spacing:.06em;margin-top:26px;font-weight:600}
+  .book{margin-top:56px;display:inline-flex;align-items:center;gap:22px;
+    background:var(--gold);color:#3a2408;font-weight:800;font-size:52px;
+    padding:34px 64px;border-radius:100px;box-shadow:0 24px 60px -16px rgba(201,150,44,.6)}
+  .phone{margin-top:40px;font-size:52px;color:#FFF9ED;font-weight:700;letter-spacing:.02em}
+  .wa{font-size:34px;color:#8fe3a0;letter-spacing:.28em;text-transform:uppercase;margin-top:18px;font-weight:600}
+
+  /* vignette + grain */
+  .vig{position:absolute;inset:0;pointer-events:none;
+    box-shadow:inset 0 0 240px 60px rgba(0,0,0,.55)}
+
+  /* replay control (not part of recording area edges) */
+  .replay{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);
+    background:#1c130a;color:#F2E1C6;border:1px solid #4a341c;border-radius:100px;
+    padding:12px 26px;font-size:15px;font-weight:600;cursor:pointer;z-index:20;
+    font-family:system-ui,sans-serif;letter-spacing:.02em}
+  .replay:hover{background:#2a1c0e}
+</style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <div class="room"></div>
+    <div class="grime"></div>
+    <div class="sheen"></div>
+    <div class="spark s1"></div><div class="spark s2"></div><div class="spark s3"></div>
+    <div class="spark s4"></div><div class="spark s5"></div><div class="spark s6"></div>
+    <div class="scrim"></div>
+
+    <!-- 1: HOOK -->
+    <div class="layer" data-scene="hook">
+      <div class="kicker">Dubai homes</div>
+      <div class="head serif">Tired of coming<br>home to a <span class="g">mess?</span></div>
+      <div class="sub">Long days. No time. And the housework never ends.</div>
+    </div>
+
+    <!-- 2: REVEAL -->
+    <div class="layer" data-scene="reveal">
+      <div class="kicker">The AlSaqar difference</div>
+      <div class="head serif">Sparkling.<br><span class="g">Every&nbsp;time.</span></div>
+      <div class="sub">A spotless home, done properly — so you can just walk in and relax.</div>
+    </div>
+
+    <!-- 3: VALUE -->
+    <div class="layer" data-scene="value">
+      <div class="kicker">One trusted person</div>
+      <div class="chips">
+        <div class="chip"><span class="dot"></span> Home cleaning</div>
+        <div class="chip"><span class="dot"></span> Cooking</div>
+        <div class="chip"><span class="dot"></span> Baby &amp; childcare</div>
+      </div>
+      <div class="sub">The same caring person each month — someone you'll come to trust.</div>
+    </div>
+
+    <!-- 4: PRICE -->
+    <div class="layer" data-scene="price">
+      <div class="price">
+        <span class="from">All of it, from</span>
+        <span class="amt">AED&nbsp;2,700<small>/mo</small></span>
+        <span class="per">Monthly. Simple. No surprises.</span>
+      </div>
+    </div>
+
+    <!-- 5: CTA -->
+    <div class="layer cta" data-scene="cta">
+      <img class="logo" src="assets/logo.png" alt="AlSaqar AlSarie">
+      <div class="brand serif">AlSaqar <span class="g">AlSarie</span></div>
+      <div class="trust">Trusted by 500+ Dubai families</div>
+      <div class="book">Book on WhatsApp →</div>
+      <div class="phone">+971 50 419 8901</div>
+      <div class="wa">Message us today</div>
+    </div>
+
+    <div class="vig"></div>
+  </div>
+
+  <button class="replay" id="replay">↺ Replay ad</button>
+
+<script>
+  const stage = document.getElementById('stage');
+  const fit = () => stage.style.setProperty('--k',
+    Math.min(innerWidth/1080, innerHeight/1920));
+  addEventListener('resize', fit); fit();
+
+  const layers = [...document.querySelectorAll('.layer')];
+  const show = name => layers.forEach(l => l.classList.toggle('on', l.dataset.scene === name));
+  let timers = [];
+  const at = (ms, fn) => timers.push(setTimeout(fn, ms));
+
+  function play(){
+    timers.forEach(clearTimeout); timers = [];
+    stage.classList.remove('clean','wipe','reading');
+    show('hook');
+
+    at(300,  () => show('hook'));
+    at(3200, () => { stage.classList.add('wipe','clean'); show('reveal'); });   // before -> after
+    at(7000, () => { stage.classList.add('reading'); show('value'); });
+    at(11200,() => { show('price'); });
+    at(14600,() => { show('cta'); });
+    at(20000,() => play());  // loop
+  }
+  document.getElementById('replay').addEventListener('click', play);
+  play();
+</script>
+</body>
+</html>
