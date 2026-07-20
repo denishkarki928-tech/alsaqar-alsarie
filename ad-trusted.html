@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AlSaqar AlSarie — Vertical Ad · Trusted (9:16)</title>
+<style>
+  :root{
+    --bg:#FBF2E4; --ink:#2A1B10; --ink-soft:#5C4630;
+    --primary:#A8451C; --primary-deep:#7A2F12;
+    --accent:#C9962C; --accent-soft:#E8C873;
+    --gold:linear-gradient(115deg,#9C6B1F 0%,#E8C873 22%,#C9962C 45%,#F3DE9F 60%,#A9791F 82%,#E8C873 100%);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#0d0805;display:grid;place-items:center;
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
+  .serif{font-family:Georgia,"Times New Roman",serif}
+
+  .stage{
+    position:fixed;top:50%;left:50%;width:1080px;height:1920px;overflow:hidden;
+    transform-origin:center;background:var(--ink);
+    box-shadow:0 40px 120px -30px rgba(0,0,0,.8);
+    transform:translate(-50%,-50%) scale(var(--k,.35));
+  }
+
+  /* Room — bright & premium throughout, slow Ken Burns drift */
+  .room{position:absolute;inset:-4%;background:url("assets/home-cleaning.jpg") center/cover no-repeat;
+    filter:brightness(1.04) saturate(1.08) contrast(1.02);
+    animation:drift 22s ease-in-out infinite alternate}
+  @keyframes drift{0%{transform:scale(1.02) translate(0,0)}100%{transform:scale(1.11) translate(-2%,-1.5%)}}
+
+  /* consistent editorial scrim — always on for a premium, legible look */
+  .scrim{position:absolute;inset:0;background:
+      linear-gradient(180deg,rgba(13,8,5,.28) 0%,rgba(13,8,5,.05) 34%,rgba(13,8,5,.55) 72%,rgba(13,8,5,.9) 100%);
+    transition:opacity .8s ease}
+  .stage.deep .scrim{opacity:1}
+  /* gentle warm tint wash for trust/premium mood */
+  .wash{position:absolute;inset:0;background:radial-gradient(120% 80% at 50% 30%,rgba(201,150,44,.12),transparent 60%);
+    mix-blend-mode:screen;pointer-events:none}
+
+  /* top trust ribbon */
+  .ribbon{position:absolute;top:70px;left:50%;transform:translateX(-50%);
+    display:flex;align-items:center;gap:16px;padding:18px 34px;border-radius:100px;
+    background:rgba(13,8,5,.42);border:1px solid rgba(232,200,115,.5);backdrop-filter:blur(4px);
+    color:var(--accent-soft);font-size:32px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+    opacity:0;transition:opacity .7s ease .2s}
+  .stage.showribbon .ribbon{opacity:1}
+  .ribbon .star{color:#F3DE9F;font-size:34px}
+
+  .layer{position:absolute;inset:0;padding:120px 90px;display:flex;flex-direction:column;
+    justify-content:flex-end;opacity:0;transition:opacity .7s ease,transform .8s cubic-bezier(.2,.7,.2,1);
+    transform:translateY(30px)}
+  .layer.on{opacity:1;transform:translateY(0)}
+  .kicker{font-size:34px;letter-spacing:.42em;text-transform:uppercase;color:var(--accent-soft);
+    font-weight:600;margin-bottom:26px}
+  .head{color:#FFF9ED;font-weight:800;line-height:1.05;font-size:104px;letter-spacing:-.02em;
+    text-shadow:0 6px 40px rgba(0,0,0,.6)}
+  .head .g{background:var(--gold);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:#F2E1C6;font-size:44px;line-height:1.32;margin-top:34px;max-width:840px;font-weight:500}
+
+  /* trust badges (checkmarks) */
+  .badges{display:flex;flex-direction:column;gap:30px;margin-top:6px}
+  .badge{display:flex;align-items:center;gap:28px;color:#FFF9ED;font-size:50px;font-weight:600;line-height:1.1}
+  .tick{width:66px;height:66px;border-radius:50%;flex:none;background:var(--gold);
+    display:grid;place-items:center;box-shadow:0 0 30px rgba(201,150,44,.55)}
+  .tick svg{width:34px;height:34px}
+
+  .price{color:#FFF9ED;font-weight:800;line-height:1;letter-spacing:-.02em}
+  .price .from{display:block;font-size:40px;letter-spacing:.3em;text-transform:uppercase;
+    color:var(--accent-soft);font-weight:600;margin-bottom:18px}
+  .price .amt{font-size:134px;white-space:nowrap}
+  .price .amt small{font-size:54px}
+  .price .per{font-size:44px;color:#F2E1C6;font-weight:500;margin-top:16px}
+
+  .cta{align-items:center;justify-content:center;text-align:center;
+    background:radial-gradient(78% 58% at 50% 46%,rgba(13,8,5,.9) 0%,rgba(13,8,5,.72) 55%,rgba(13,8,5,.5) 100%)}
+  .logo{width:190px;height:190px;border-radius:50%;object-fit:cover;
+    border:4px solid transparent;background:var(--gold) border-box;
+    box-shadow:0 20px 60px -18px rgba(0,0,0,.7);margin-bottom:44px}
+  .brand{font-size:104px;font-weight:700;line-height:1;letter-spacing:-.01em;color:#FFF9ED}
+  .brand .g{background:var(--gold);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .trust{font-size:40px;color:var(--accent-soft);letter-spacing:.06em;margin-top:26px;font-weight:600}
+  .book{margin-top:56px;display:inline-flex;align-items:center;gap:22px;
+    background:var(--gold);color:#3a2408;font-weight:800;font-size:52px;
+    padding:34px 64px;border-radius:100px;box-shadow:0 24px 60px -16px rgba(201,150,44,.6)}
+  .phone{margin-top:40px;font-size:52px;color:#FFF9ED;font-weight:700;letter-spacing:.02em}
+  .wa{font-size:34px;color:#8fe3a0;letter-spacing:.28em;text-transform:uppercase;margin-top:18px;font-weight:600}
+
+  .vig{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 240px 60px rgba(0,0,0,.55)}
+
+  .replay{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);
+    background:#1c130a;color:#F2E1C6;border:1px solid #4a341c;border-radius:100px;
+    padding:12px 26px;font-size:15px;font-weight:600;cursor:pointer;z-index:20;
+    font-family:system-ui,sans-serif;letter-spacing:.02em}
+  .replay:hover{background:#2a1c0e}
+</style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <div class="room"></div>
+    <div class="wash"></div>
+    <div class="scrim"></div>
+
+    <div class="ribbon"><span class="star">★</span> Trusted by 500+ Dubai families</div>
+
+    <!-- 1: HOOK -->
+    <div class="layer" data-scene="hook">
+      <div class="kicker">Your home · your family</div>
+      <div class="head serif">Who do you<br><span class="g">trust</span> in your home?</div>
+      <div class="sub">Letting someone in isn't just about cleaning — it's about trust.</div>
+    </div>
+
+    <!-- 2: ANSWER -->
+    <div class="layer" data-scene="answer">
+      <div class="kicker">Dubai's trusted home help</div>
+      <div class="head serif">The help families<br><span class="g">rely on.</span></div>
+      <div class="sub">Vetted, dependable, and genuinely caring — in over 500 Dubai homes.</div>
+    </div>
+
+    <!-- 3: TRUST BADGES -->
+    <div class="layer" data-scene="value">
+      <div class="kicker">Why families choose us</div>
+      <div class="badges">
+        <div class="badge"><span class="tick"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6" stroke="#3a2408" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span> Vetted &amp; background-checked</div>
+        <div class="badge"><span class="tick"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6" stroke="#3a2408" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span> The same trusted person</div>
+        <div class="badge"><span class="tick"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6" stroke="#3a2408" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span> Cleaning · Cooking · Baby care</div>
+      </div>
+      <div class="sub">One reliable person you'll come to know — month after month.</div>
+    </div>
+
+    <!-- 4: PRICE -->
+    <div class="layer" data-scene="price">
+      <div class="price">
+        <span class="from">Trusted care, from</span>
+        <span class="amt">AED&nbsp;2,700<small>/mo</small></span>
+        <span class="per">One helper. One simple monthly plan.</span>
+      </div>
+    </div>
+
+    <!-- 5: CTA -->
+    <div class="layer cta" data-scene="cta">
+      <img class="logo" src="assets/logo.png" alt="AlSaqar AlSarie">
+      <div class="brand serif">AlSaqar <span class="g">AlSarie</span></div>
+      <div class="trust">Trusted by 500+ Dubai families</div>
+      <div class="book">Book on WhatsApp →</div>
+      <div class="phone">+971 50 419 8901</div>
+      <div class="wa">Message us today</div>
+    </div>
+
+    <div class="vig"></div>
+  </div>
+
+  <button class="replay" id="replay">↺ Replay ad</button>
+
+<script>
+  const stage = document.getElementById('stage');
+  const fit = () => stage.style.setProperty('--k',
+    Math.min(innerWidth/1080, innerHeight/1920));
+  addEventListener('resize', fit); fit();
+
+  const layers = [...document.querySelectorAll('.layer')];
+  const show = name => layers.forEach(l => l.classList.toggle('on', l.dataset.scene === name));
+  let timers = [];
+  const at = (ms, fn) => timers.push(setTimeout(fn, ms));
+
+  function play(){
+    timers.forEach(clearTimeout); timers = [];
+    stage.classList.remove('deep');
+    show('hook');
+    at(300,  () => { stage.classList.add('showribbon'); show('hook'); });
+    at(3400, () => show('answer'));
+    at(7000, () => { stage.classList.add('deep'); show('value'); });
+    at(11500,() => show('price'));
+    at(15200,() => { stage.classList.remove('showribbon'); show('cta'); });
+    at(20500,() => play());
+  }
+  document.getElementById('replay').addEventListener('click', play);
+  play();
+</script>
+</body>
+</html>
