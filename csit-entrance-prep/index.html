@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSIT Entrance Practice — TU IOST</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --panel2:#1e222b; --border:#2a2f3a;
+    --text:#e8eaed; --muted:#9aa3af; --accent:#4f8cff; --accent2:#7c5cff;
+    --good:#2ecc71; --bad:#ff5c5c; --warn:#f5a623;
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#f5f6f8; --panel:#ffffff; --panel2:#f0f1f4; --border:#e0e2e8; --text:#1a1d24; --muted:#5c636f; }
+  }
+  :root[data-theme="light"]{ --bg:#f5f6f8; --panel:#ffffff; --panel2:#f0f1f4; --border:#e0e2e8; --text:#1a1d24; --muted:#5c636f; }
+  :root[data-theme="dark"]{ --bg:#0f1115; --panel:#171a21; --panel2:#1e222b; --border:#2a2f3a; --text:#e8eaed; --muted:#9aa3af; }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg); color:var(--text); min-height:100vh;
+  }
+  .wrap{max-width:760px; margin:0 auto; padding:24px 16px 80px;}
+  header{text-align:center; margin-bottom:20px;}
+  header h1{font-size:1.4rem; margin:0 0 4px;}
+  header p{color:var(--muted); font-size:0.85rem; margin:0;}
+
+  .card{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:20px; margin-bottom:16px;}
+
+  /* --- Set picker --- */
+  .setgrid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px;}
+  @media (max-width:480px){ .setgrid{grid-template-columns:1fr;} }
+  .setbtn{
+    background:var(--panel2); border:1px solid var(--border); border-radius:12px; padding:16px;
+    cursor:pointer; text-align:left; color:var(--text); transition:transform .12s, border-color .12s;
+  }
+  .setbtn:hover{border-color:var(--accent); transform:translateY(-2px);}
+  .setbtn b{display:block; font-size:1.05rem; margin-bottom:4px;}
+  .setbtn span{color:var(--muted); font-size:0.8rem;}
+  .setbtn .prog{margin-top:8px; font-size:0.75rem; color:var(--accent);}
+
+  /* --- Quiz header/progress --- */
+  .quizhead{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; flex-wrap:wrap;}
+  .quizhead .meta{font-size:0.8rem; color:var(--muted);}
+  .backbtn, .navbtn{
+    background:var(--panel2); border:1px solid var(--border); color:var(--text);
+    padding:8px 14px; border-radius:10px; cursor:pointer; font-size:0.85rem;
+  }
+  .backbtn:hover, .navbtn:hover{border-color:var(--accent);}
+  .navbtn:disabled{opacity:0.4; cursor:not-allowed;}
+  .progressbar{height:6px; background:var(--panel2); border-radius:4px; overflow:hidden; margin-bottom:18px;}
+  .progressbar > div{height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); transition:width .2s;}
+
+  .tag{
+    display:inline-block; font-size:0.7rem; font-weight:600; letter-spacing:0.03em;
+    text-transform:uppercase; color:var(--accent); background:rgba(79,140,255,0.12);
+    padding:3px 9px; border-radius:20px; margin-bottom:10px;
+  }
+  .qtext{font-size:1.08rem; line-height:1.5; margin:0 0 18px;}
+
+  .options{display:flex; flex-direction:column; gap:10px;}
+  .opt{
+    display:flex; align-items:center; gap:12px; text-align:left;
+    background:var(--panel2); border:1.5px solid var(--border); border-radius:10px;
+    padding:12px 14px; cursor:pointer; font-size:0.95rem; color:var(--text);
+    transition:border-color .12s, background .12s;
+  }
+  .opt:hover:not(.locked){border-color:var(--accent);}
+  .opt .letter{
+    flex:none; width:26px; height:26px; border-radius:50%; background:var(--border);
+    display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:700;
+  }
+  .opt.correct{border-color:var(--good); background:rgba(46,204,113,0.12);}
+  .opt.correct .letter{background:var(--good); color:#08301a;}
+  .opt.incorrect{border-color:var(--bad); background:rgba(255,92,92,0.12);}
+  .opt.incorrect .letter{background:var(--bad); color:#3a0808;}
+  .opt.locked{cursor:default;}
+  .opt.dim{opacity:0.55;}
+
+  .feedback{
+    margin-top:16px; padding:14px 16px; border-radius:10px; font-size:0.9rem; line-height:1.55;
+    display:none;
+  }
+  .feedback.show{display:block;}
+  .feedback.right{background:rgba(46,204,113,0.1); border:1px solid rgba(46,204,113,0.4);}
+  .feedback.wrong{background:rgba(255,92,92,0.1); border:1px solid rgba(255,92,92,0.4);}
+  .feedback .fbtitle{font-weight:700; margin-bottom:6px;}
+  .feedback.right .fbtitle{color:var(--good);}
+  .feedback.wrong .fbtitle{color:var(--bad);}
+
+  .footer-nav{display:flex; justify-content:space-between; margin-top:20px; gap:10px;}
+  .footer-nav .navbtn{flex:1;}
+  .navbtn.primary{background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600;}
+  .navbtn.primary:hover{filter:brightness(1.08);}
+
+  /* --- Results --- */
+  .resultbig{font-size:2.4rem; font-weight:800; text-align:center; margin:8px 0 2px;}
+  .resultsub{text-align:center; color:var(--muted); margin-bottom:18px; font-size:0.9rem;}
+  .breakdown{display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:18px;}
+  .bditem{background:var(--panel2); border:1px solid var(--border); border-radius:10px; padding:10px 12px; font-size:0.85rem;}
+  .bditem b{display:block; font-size:1rem;}
+  .reviewlist{display:flex; flex-direction:column; gap:8px; margin-top:6px;}
+  .reviewitem{
+    background:var(--panel2); border:1px solid var(--border); border-left:4px solid var(--bad);
+    border-radius:8px; padding:10px 12px; font-size:0.85rem; cursor:pointer;
+  }
+  .reviewitem.ok{border-left-color:var(--good);}
+  .reviewitem:hover{border-color:var(--accent);}
+
+  .hidden{display:none !important;}
+  footer.credit{text-align:center; color:var(--muted); font-size:0.75rem; margin-top:24px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>CSIT Entrance Practice</h1>
+    <p>TU IOST · B.Sc. CSIT Entrance · 4 Predicted Model Sets · instant answers &amp; explanations</p>
+  </header>
+
+  <!-- SET PICKER -->
+  <div id="picker" class="card">
+    <div class="setgrid" id="setgrid"></div>
+  </div>
+
+  <!-- QUIZ VIEW -->
+  <div id="quizview" class="hidden">
+    <div class="quizhead">
+      <button class="backbtn" id="btnBack">← All sets</button>
+      <div class="meta" id="quizMeta"></div>
+    </div>
+    <div class="progressbar"><div id="progressFill" style="width:0%"></div></div>
+
+    <div class="card">
+      <span class="tag" id="qSection"></span>
+      <p class="qtext" id="qText"></p>
+      <div class="options" id="options"></div>
+
+      <div class="feedback" id="feedback">
+        <div class="fbtitle" id="fbTitle"></div>
+        <div id="fbBody"></div>
+      </div>
+
+      <div class="footer-nav">
+        <button class="navbtn" id="btnPrev">← Previous</button>
+        <button class="navbtn primary" id="btnNext">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS VIEW -->
+  <div id="resultview" class="hidden">
+    <div class="quizhead">
+      <button class="backbtn" id="btnBack2">← All sets</button>
+      <div class="meta" id="resultMeta"></div>
+    </div>
+    <div class="card">
+      <div class="resultbig" id="resultScore"></div>
+      <div class="resultsub" id="resultSub"></div>
+      <div class="breakdown" id="breakdown"></div>
+      <button class="navbtn primary" id="btnReviewMissed" style="width:100%; margin-bottom:8px;">Review missed questions</button>
+      <button class="navbtn" id="btnRetake" style="width:100%;">Retake this set</button>
+    </div>
+    <div class="card hidden" id="reviewCard">
+      <h3 style="margin-top:0;">Missed questions</h3>
+      <div class="reviewlist" id="reviewList"></div>
+    </div>
+  </div>
+
+  <footer class="credit">All 4 model sets · 100 questions each · Math / Physics / Chemistry / English / Computer</footer>
+</div>
+
+<script src="data.js"></script>
+<script>
+const SECTIONS = [
+  {name:"Mathematics", from:0, to:25},
+  {name:"Physics", from:25, to:50},
+  {name:"Chemistry", from:50, to:75},
+  {name:"English", from:75, to:90},
+  {name:"Computer", from:90, to:100},
+];
+function sectionFor(idx){
+  for(const s of SECTIONS) if(idx>=s.from && idx<s.to) return s.name;
+  return "";
+}
+
+const STORE_KEY = "csit_prep_progress_v1";
+function loadProgress(){
+  try{ return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; }catch(e){ return {}; }
+}
+function saveProgress(p){ localStorage.setItem(STORE_KEY, JSON.stringify(p)); }
+let progress = loadProgress();
+
+let state = null; // { setId, idx, answers: [null|{picked, correct}], }
+
+const picker = document.getElementById('picker');
+const setgrid = document.getElementById('setgrid');
+const quizview = document.getElementById('quizview');
+const resultview = document.getElementById('resultview');
+
+function renderPicker(){
+  setgrid.innerHTML = '';
+  [1,2,3,4].forEach(setId=>{
+    const total = QUESTIONS[setId].length;
+    const p = progress[setId];
+    const answeredCount = p ? p.answers.filter(a=>a!==null && a!==undefined).length : 0;
+    const btn = document.createElement('div');
+    btn.className = 'setbtn';
+    let progText = 'Not started';
+    if(p && p.finished){
+      const score = p.answers.filter(a=>a && a.correct).length;
+      progText = `Completed · Score ${score}/${total}`;
+    } else if(answeredCount>0){
+      progText = `In progress · ${answeredCount}/${total} answered`;
+    }
+    btn.innerHTML = `<b>Model Set ${setId}</b><span>${total} questions · Math, Physics, Chemistry, English, Computer</span><div class="prog">${progText}</div>`;
+    btn.onclick = ()=> startSet(setId);
+    setgrid.appendChild(btn);
+  });
+}
+
+function startSet(setId, resume){
+  const total = QUESTIONS[setId].length;
+  let p = progress[setId];
+  if(!p || !resume){
+    p = { answers: new Array(total).fill(null), idx: 0, finished:false };
+    progress[setId] = p;
+    saveProgress(progress);
+  }
+  state = { setId, idx: p.idx || 0 };
+  picker.classList.add('hidden');
+  resultview.classList.add('hidden');
+  quizview.classList.remove('hidden');
+  renderQuestion();
+}
+
+function currentAnswers(){ return progress[state.setId].answers; }
+
+function renderQuestion(){
+  const setId = state.setId;
+  const qs = QUESTIONS[setId];
+  const total = qs.length;
+  const idx = state.idx;
+  const q = qs[idx];
+  const ans = currentAnswers()[idx];
+
+  document.getElementById('quizMeta').textContent = `Model Set ${setId} · Question ${idx+1} of ${total}`;
+  document.getElementById('progressFill').style.width = ((idx+1)/total*100)+'%';
+  document.getElementById('qSection').textContent = sectionFor(idx);
+  document.getElementById('qText').textContent = `${idx+1}. ${q.t}`;
+
+  const optWrap = document.getElementById('options');
+  optWrap.innerHTML = '';
+  const letters = ['A','B','C','D'];
+  q.o.forEach((optText, i)=>{
+    const div = document.createElement('div');
+    div.className = 'opt';
+    div.innerHTML = `<span class="letter">${letters[i]}</span><span>${optText}</span>`;
+    if(ans){
+      div.classList.add('locked');
+      if(i === q.c) div.classList.add('correct');
+      else if(i === ans.picked) div.classList.add('incorrect');
+      else div.classList.add('dim');
+    } else {
+      div.onclick = ()=> selectAnswer(i);
+    }
+    optWrap.appendChild(div);
+  });
+
+  const fb = document.getElementById('feedback');
+  if(ans){
+    fb.classList.add('show');
+    fb.classList.toggle('right', ans.correct);
+    fb.classList.toggle('wrong', !ans.correct);
+    document.getElementById('fbTitle').textContent = ans.correct ? '✓ Correct!' : `✗ Not quite — correct answer is ${letters[q.c]}`;
+    document.getElementById('fbBody').textContent = q.e;
+  } else {
+    fb.classList.remove('show','right','wrong');
+  }
+
+  document.getElementById('btnPrev').disabled = idx===0;
+  const nextBtn = document.getElementById('btnNext');
+  nextBtn.textContent = idx===total-1 ? 'Finish →' : 'Next →';
+}
+
+function selectAnswer(i){
+  const setId = state.setId;
+  const idx = state.idx;
+  const q = QUESTIONS[setId][idx];
+  const correct = i === q.c;
+  const answers = currentAnswers();
+  answers[idx] = { picked: i, correct };
+  progress[setId].idx = idx;
+  saveProgress(progress);
+  renderQuestion();
+}
+
+document.getElementById('btnPrev').onclick = ()=>{
+  if(state.idx>0){ state.idx--; progress[state.setId].idx = state.idx; saveProgress(progress); renderQuestion(); }
+};
+document.getElementById('btnNext').onclick = ()=>{
+  const total = QUESTIONS[state.setId].length;
+  if(state.idx < total-1){
+    state.idx++;
+    progress[state.setId].idx = state.idx;
+    saveProgress(progress);
+    renderQuestion();
+  } else {
+    finishSet();
+  }
+};
+
+function finishSet(){
+  const setId = state.setId;
+  progress[setId].finished = true;
+  saveProgress(progress);
+  quizview.classList.add('hidden');
+  resultview.classList.remove('hidden');
+  renderResults();
+}
+
+function renderResults(){
+  const setId = state.setId;
+  const qs = QUESTIONS[setId];
+  const answers = progress[setId].answers;
+  const total = qs.length;
+  const answeredCount = answers.filter(a=>a).length;
+  const score = answers.filter(a=>a && a.correct).length;
+  document.getElementById('resultMeta').textContent = `Model Set ${setId} · Results`;
+  document.getElementById('resultScore').textContent = `${score} / ${total}`;
+  const pct = total ? Math.round(score/total*100) : 0;
+  document.getElementById('resultSub').textContent =
+    answeredCount < total
+      ? `${pct}% correct · ${total-answeredCount} question(s) left unanswered`
+      : `${pct}% correct`;
+
+  // breakdown by section
+  const bd = document.getElementById('breakdown');
+  bd.innerHTML = '';
+  SECTIONS.forEach(sec=>{
+    let s=0, t=0;
+    for(let i=sec.from;i<sec.to;i++){ t++; if(answers[i] && answers[i].correct) s++; }
+    const div = document.createElement('div');
+    div.className = 'bditem';
+    div.innerHTML = `<b>${s}/${t}</b>${sec.name}`;
+    bd.appendChild(div);
+  });
+
+  // review list (hidden until clicked)
+  document.getElementById('reviewCard').classList.add('hidden');
+  const rl = document.getElementById('reviewList');
+  rl.innerHTML = '';
+  let missedCount = 0;
+  qs.forEach((q, i)=>{
+    const a = answers[i];
+    if(!a || a.correct) return;
+    missedCount++;
+    const div = document.createElement('div');
+    div.className = 'reviewitem';
+    div.textContent = `Q${i+1}. ${q.t}`;
+    div.onclick = ()=>{
+      resultview.classList.add('hidden');
+      quizview.classList.remove('hidden');
+      state = { setId, idx:i };
+      renderQuestion();
+    };
+    rl.appendChild(div);
+  });
+  if(missedCount === 0){
+    rl.innerHTML = '<div style="color:var(--muted); font-size:0.9rem;">No missed questions — perfect on everything you answered! 🎉</div>';
+  }
+}
+
+document.getElementById('btnReviewMissed').onclick = ()=>{
+  const card = document.getElementById('reviewCard');
+  card.classList.toggle('hidden');
+};
+document.getElementById('btnRetake').onclick = ()=>{
+  startSet(state.setId, false);
+};
+
+function goBackHome(){
+  quizview.classList.add('hidden');
+  resultview.classList.add('hidden');
+  picker.classList.remove('hidden');
+  renderPicker();
+}
+document.getElementById('btnBack').onclick = goBackHome;
+document.getElementById('btnBack2').onclick = goBackHome;
+
+renderPicker();
+</script>
+</body>
+</html>
