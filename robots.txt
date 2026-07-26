@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Ad creatives and demo pages are excluded from search via a noindex meta tag
+# on each page rather than a Disallow rule here — crawlers must be able to
+# fetch those pages in order to see the noindex directive.
+
+Sitemap: https://denishkarki928-tech.github.io/alsaqar-alsarie/sitemap.xml
