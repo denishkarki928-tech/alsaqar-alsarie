@@ -36,6 +36,11 @@
     cursor:pointer; text-align:left; color:var(--text); transition:transform .12s, border-color .12s;
   }
   .setbtn:hover{border-color:var(--accent); transform:translateY(-2px);}
+  .setbtn.official{border-color:var(--accent); background:linear-gradient(180deg,rgba(79,140,255,0.10),var(--panel2));}
+  .setbtn .badge{
+    float:right; font-size:0.6rem; font-weight:800; letter-spacing:0.06em;
+    background:var(--accent); color:#fff; padding:3px 7px; border-radius:5px; margin-left:8px;
+  }
   .setbtn b{display:block; font-size:1.05rem; margin-bottom:4px;}
   .setbtn span{color:var(--muted); font-size:0.8rem;}
   .setbtn .prog{margin-top:8px; font-size:0.75rem; color:var(--accent);}
@@ -116,7 +121,7 @@
 <div class="wrap">
   <header>
     <h1>CSIT Entrance Practice</h1>
-    <p>TU IOST · B.Sc. CSIT Entrance · 4 Predicted Model Sets · instant answers &amp; explanations</p>
+    <p>TU IOST · B.Sc. CSIT Entrance · official model question + 4 predicted sets · instant answers &amp; explanations</p>
   </header>
 
   <!-- SET PICKER -->
@@ -168,7 +173,7 @@
     </div>
   </div>
 
-  <footer class="credit">All 4 model sets · 100 questions each · Math / Physics / Chemistry / English / Computer</footer>
+  <footer class="credit">5 sets · 100 questions each · Mathematics 25 / Physics 25 / Chemistry 25 / English 15 / Computer 10</footer>
 </div>
 
 <script src="data.js"></script>
@@ -199,14 +204,28 @@ const setgrid = document.getElementById('setgrid');
 const quizview = document.getElementById('quizview');
 const resultview = document.getElementById('resultview');
 
+const SETS = [
+  {id:5, title:'Official IOST Model Question', sub:'The paper TU publishes · answers worked out here', official:true},
+  {id:1, title:'Model Set 1', sub:'Predicted practice paper'},
+  {id:2, title:'Model Set 2', sub:'Predicted practice paper'},
+  {id:3, title:'Model Set 3', sub:'Predicted practice paper'},
+  {id:4, title:'Model Set 4', sub:'Predicted practice paper'},
+];
+
+function titleFor(setId){
+  const s = SETS.find(x=>x.id===setId);
+  return s ? s.title : `Model Set ${setId}`;
+}
+
 function renderPicker(){
   setgrid.innerHTML = '';
-  [1,2,3,4].forEach(setId=>{
+  SETS.forEach(set=>{
+    const setId = set.id;
     const total = QUESTIONS[setId].length;
     const p = progress[setId];
     const answeredCount = p ? p.answers.filter(a=>a!==null && a!==undefined).length : 0;
     const btn = document.createElement('div');
-    btn.className = 'setbtn';
+    btn.className = 'setbtn' + (set.official ? ' official' : '');
     let progText = 'Not started';
     if(p && p.finished){
       const score = p.answers.filter(a=>a && a.correct).length;
@@ -214,8 +233,9 @@ function renderPicker(){
     } else if(answeredCount>0){
       progText = `In progress · ${answeredCount}/${total} answered`;
     }
-    btn.innerHTML = `<b>Model Set ${setId}</b><span>${total} questions · Math, Physics, Chemistry, English, Computer</span><div class="prog">${progText}</div>`;
-    btn.onclick = ()=> startSet(setId);
+    const badge = set.official ? '<span class="badge">OFFICIAL</span>' : '';
+    btn.innerHTML = `<b>${set.title}${badge}</b><span>${total} questions · ${set.sub}</span><div class="prog">${progText}</div>`;
+    btn.onclick = ()=> startSet(setId, true);
     setgrid.appendChild(btn);
   });
 }
@@ -245,7 +265,7 @@ function renderQuestion(){
   const q = qs[idx];
   const ans = currentAnswers()[idx];
 
-  document.getElementById('quizMeta').textContent = `Model Set ${setId} · Question ${idx+1} of ${total}`;
+  document.getElementById('quizMeta').textContent = `${titleFor(setId)} · Question ${idx+1} of ${total}`;
   document.getElementById('progressFill').style.width = ((idx+1)/total*100)+'%';
   document.getElementById('qSection').textContent = sectionFor(idx);
   document.getElementById('qText').textContent = `${idx+1}. ${q.t}`;
@@ -327,7 +347,7 @@ function renderResults(){
   const total = qs.length;
   const answeredCount = answers.filter(a=>a).length;
   const score = answers.filter(a=>a && a.correct).length;
-  document.getElementById('resultMeta').textContent = `Model Set ${setId} · Results`;
+  document.getElementById('resultMeta').textContent = `${titleFor(setId)} · Results`;
   document.getElementById('resultScore').textContent = `${score} / ${total}`;
   const pct = total ? Math.round(score/total*100) : 0;
   document.getElementById('resultSub').textContent =
